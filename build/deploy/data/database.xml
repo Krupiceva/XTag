@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dataSets>
+    <dataSet>
+        <cameraAngle>0.0</cameraAngle>
+        <cameraHigh>0.0</cameraHigh>
+        <dataSetAnnotationsLocation>sample/annotations</dataSetAnnotationsLocation>
+        <dataSetImages>
+            <imageName>truck.jpg</imageName>
+        </dataSetImages>
+        <dataSetImagesLocation>sample/images</dataSetImagesLocation>
+        <dataSetName>Test set</dataSetName>
+        <imageQuality>Unknown</imageQuality>
+        <numOfImgInDataSet>1</numOfImgInDataSet>
+        <weatherCondition>Unknown</weatherCondition>
+    </dataSet>
+</dataSets>
