@@ -11,7 +11,7 @@ Put /build/deploy folder where you want and run TaggingApp.
 <br>
 or
 <br>
-download .exe instalation pack from: <a href="https://drive.google.com/uc?export=download&id=1wbcEz5SS2MR3aKmp1RCCP3Q2NVRBWcpX">Here</a> and "Run as administrator..."
+download .exe instalation pack from: <a href="https://dl.dropboxusercontent.com/s/kqz8v258zebfioi/XTag-1.2.exe.zip?dl=0">Here</a> and "Run as administrator..."
 
 
 <h2> Version releases </h2>
