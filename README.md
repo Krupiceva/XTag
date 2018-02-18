@@ -7,11 +7,11 @@ where I work as a student.
 Bachelor Thesis is in repository: https://github.com/Krupiceva/bachelor_thesis
 
 <h2> Installation Instructions </h2>
-Put /build/deploy folder where you want and run TaggingApp.jar
-
+Put /build/deploy folder where you want and run TaggingApp.
+<br>
 or
-
-download .exe instalation pack from: <a href="https://drive.google.com/uc?export=download&id=1wbcEz5SS2MR3aKmp1RCCP3Q2NVRBWcpX">Here</a>
+<br>
+download .exe instalation pack from: <a href="https://drive.google.com/uc?export=download&id=1wbcEz5SS2MR3aKmp1RCCP3Q2NVRBWcpX">Here</a> and "Run as administrator..."
 
 
 <h2> Version releases </h2>
