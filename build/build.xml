@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<project name="TaggingApp" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	<target name="init-fx-tasks">
+		<path id="fxant">
+			<filelist>
+				<file name="${java.home}\..\lib\ant-javafx.jar"/>
+				<file name="${java.home}\lib\jfxrt.jar"/>
+				<file name="${basedir}"/>
+			</filelist>
+		</path>
+	
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+			uri="javafx:com.sun.javafx.tools.ant"
+			classpathref="fxant"/>
+	</target>
+	<target name="setup-staging-area">
+		<delete dir="externalLibs" />
+		<delete dir="project" />
+		<delete dir="projectRefs" />
+	
+		<mkdir dir="externalLibs" />
+	
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-android-arm.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-linux-ppc64le.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-android-arm.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-linux-ppc64le.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-linux-ppc64le.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="videoinput-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-android-arm.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-linux-ppc64le.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect2-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="brownies-collections-0.9.13.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect2-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="javacv.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="javacpp.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-linux-ppc64le.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-android-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-android-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect2-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-android-arm.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect2-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="javacv-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-android-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect2-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="videoinput.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-android-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="librealsense-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="videoinput-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="videoinput-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-macosx-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flycapture-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-platform.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="opencv-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-linux-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-linux-armhf.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libfreenect-linux-ppc64le.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="libdc1394-windows-x86.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="artoolkitplus-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="ffmpeg-linux-x86_64.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="flandmark-windows-x86_64.jar"/>
+			</fileset>
+		</copy>
+	
+		<mkdir dir="project" />
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="sample/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="icons/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="src/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="sample\images/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="data/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="config/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="sample\annotations/**" />
+			</fileset>
+		</copy>
+	
+		<mkdir dir="projectRefs" />
+	</target>
+	<target name='do-compile'>
+		<delete dir="build" />
+		<mkdir dir="build/src" />
+		<mkdir dir="build/libs" />
+		<mkdir dir="build/classes" />
+	
+		<!-- Copy project-libs references -->
+		<copy todir="build/libs">
+			<fileset dir="externalLibs">
+				<include name="flycapture-linux-x86_64.jar"/>
+				<include name="librealsense-windows-x86_64.jar"/>
+				<include name="opencv-linux-armhf.jar"/>
+				<include name="artoolkitplus-android-x86.jar"/>
+				<include name="opencv-platform.jar"/>
+				<include name="ffmpeg-linux-x86_64.jar"/>
+				<include name="ffmpeg-linux-x86.jar"/>
+				<include name="ffmpeg-linux-ppc64le.jar"/>
+				<include name="libfreenect-linux-armhf.jar"/>
+				<include name="artoolkitplus-linux-armhf.jar"/>
+				<include name="libfreenect-platform.jar"/>
+				<include name="artoolkitplus-platform.jar"/>
+				<include name="brownies-collections-0.9.13.jar"/>
+				<include name="libfreenect-windows-x86_64.jar"/>
+				<include name="libfreenect-macosx-x86_64.jar"/>
+				<include name="libdc1394-linux-x86.jar"/>
+				<include name="ffmpeg-platform.jar"/>
+				<include name="opencv-android-x86.jar"/>
+				<include name="opencv-android-arm.jar"/>
+				<include name="opencv-linux-ppc64le.jar"/>
+				<include name="ffmpeg-macosx-x86_64.jar"/>
+				<include name="ffmpeg-windows-x86_64.jar"/>
+				<include name="javacv.jar"/>
+				<include name="libfreenect2.jar"/>
+				<include name="javacpp.jar"/>
+				<include name="ffmpeg-linux-armhf.jar"/>
+				<include name="libdc1394-platform.jar"/>
+				<include name="libdc1394-linux-x86_64.jar"/>
+				<include name="libdc1394-macosx-x86_64.jar"/>
+				<include name="ffmpeg-android-x86.jar"/>
+				<include name="libdc1394.jar"/>
+				<include name="videoinput-platform.jar"/>
+				<include name="videoinput-windows-x86.jar"/>
+				<include name="artoolkitplus.jar"/>
+				<include name="artoolkitplus-android-arm.jar"/>
+				<include name="libfreenect-linux-x86_64.jar"/>
+				<include name="librealsense-linux-x86_64.jar"/>
+				<include name="flandmark-linux-ppc64le.jar"/>
+				<include name="libdc1394-linux-ppc64le.jar"/>
+				<include name="flandmark-linux-armhf.jar"/>
+				<include name="flycapture-platform.jar"/>
+				<include name="flycapture-linux-x86.jar"/>
+				<include name="videoinput.jar"/>
+				<include name="flandmark-android-x86.jar"/>
+				<include name="flycapture-linux-armhf.jar"/>
+				<include name="ffmpeg-android-arm.jar"/>
+				<include name="flycapture-windows-x86_64.jar"/>
+				<include name="librealsense-windows-x86.jar"/>
+				<include name="artoolkitplus-linux-ppc64le.jar"/>
+				<include name="flandmark-macosx-x86_64.jar"/>
+				<include name="opencv-linux-x86.jar"/>
+				<include name="ffmpeg.jar"/>
+				<include name="libfreenect2-windows-x86_64.jar"/>
+				<include name="libfreenect.jar"/>
+				<include name="libdc1394-windows-x86.jar"/>
+				<include name="videoinput-windows-x86_64.jar"/>
+				<include name="libfreenect2-macosx-x86_64.jar"/>
+				<include name="opencv-macosx-x86_64.jar"/>
+				<include name="flandmark-linux-x86.jar"/>
+				<include name="opencv-windows-x86_64.jar"/>
+				<include name="flandmark-android-arm.jar"/>
+				<include name="libdc1394-windows-x86_64.jar"/>
+				<include name="ffmpeg-windows-x86.jar"/>
+				<include name="libdc1394-linux-armhf.jar"/>
+				<include name="libfreenect-windows-x86.jar"/>
+				<include name="artoolkitplus-linux-x86.jar"/>
+				<include name="libfreenect-linux-ppc64le.jar"/>
+				<include name="opencv-linux-x86_64.jar"/>
+				<include name="libfreenect2-linux-x86.jar"/>
+				<include name="librealsense-platform.jar"/>
+				<include name="flycapture.jar"/>
+				<include name="flycapture-windows-x86.jar"/>
+				<include name="flandmark-windows-x86.jar"/>
+				<include name="librealsense-linux-x86.jar"/>
+				<include name="artoolkitplus-macosx-x86_64.jar"/>
+				<include name="opencv-windows-x86.jar"/>
+				<include name="artoolkitplus-windows-x86_64.jar"/>
+				<include name="javacv-platform.jar"/>
+				<include name="libfreenect2-linux-x86_64.jar"/>
+				<include name="artoolkitplus-linux-x86_64.jar"/>
+				<include name="librealsense-macosx-x86_64.jar"/>
+				<include name="libfreenect2-platform.jar"/>
+				<include name="opencv.jar"/>
+				<include name="flandmark.jar"/>
+				<include name="libfreenect-linux-x86.jar"/>
+				<include name="artoolkitplus-windows-x86.jar"/>
+				<include name="flandmark-linux-x86_64.jar"/>
+				<include name="flandmark-platform.jar"/>
+				<include name="flandmark-windows-x86_64.jar"/>
+				<include name="librealsense.jar"/>
+			</fileset>
+		</copy>
+	
+		<!-- Copy project references -->
+	
+		<!-- Copy project sources itself -->
+		<copy todir="build/src">
+			<fileset dir="project/sample/annotations">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/data">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/src">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/icons">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/sample">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/config">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/sample/images">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+	
+		<javac includeantruntime="false" source="1.8" target="1.8" srcdir="build/src" destdir="build/classes" encoding="Cp1250">
+			<classpath>
+				<fileset dir="build/libs">
+					<include name="*"/>
+				</fileset>
+			</classpath>
+		</javac>
+	
+		<!-- Copy over none Java-Files -->
+		<copy todir="build/classes">
+		<fileset dir="project/sample/annotations">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/data">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/src">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/icons">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/sample">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/config">
+			<exclude name="**/*.java"/>
+		</fileset>
+		<fileset dir="project/sample/images">
+			<exclude name="**/*.java"/>
+		</fileset>
+		</copy>
+	
+	
+	</target>
+	<target name="do-deploy" depends="setup-staging-area, do-compile, init-fx-tasks">
+		<delete file="dist"/>
+		<delete file="deploy" />
+	
+		<mkdir dir="dist" />
+		<mkdir dir="dist/libs" />
+	
+		<copy todir="dist/libs">
+			<fileset dir="externalLibs">
+				<include name="*" />
+			</fileset>
+		</copy>
+	
+	
+		<fx:resources id="appRes">
+			<fx:fileset dir="dist" includes="TaggingApp.jar"/>
+			<fx:fileset dir="dist" includes="libs/*"/>
+			<fx:fileset dir="dist" includes="config/*"/>
+			<fx:fileset dir="dist" includes="data/*"/>
+			<fx:fileset dir="dist" includes="icons/*"/>
+			<fx:fileset dir="dist" includes="sample/*"/>
+			<fx:fileset dir="dist" includes="sample/annotations/*"/>
+			<fx:fileset dir="dist" includes="sample/images/*"/>
+		</fx:resources>
+	
+		<fx:application id="fxApplication"
+			name="XTag"
+			mainClass="fer.hr.telegra.MainApp"
+			version="1.2"
+		/>
+	
+		<mkdir dir="build/classes/META-INF" />
+	
+	
+	
+		<fx:jar destfile="dist/TaggingApp.jar">
+			<fx:application refid="fxApplication"/>
+			<fileset dir="build/classes">
+			</fileset>
+			<fx:resources refid="appRes"/>
+	
+			<manifest>
+				<attribute name="Implementation-Vendor" value="fer.hr.telegra"/>
+				<attribute name="Implementation-Title" value="XTag"/>
+				<attribute name="Implementation-Version" value="1.2"/>
+				<attribute name="JavaFX-Feature-Proxy" value="None"/>
+			</manifest>
+		</fx:jar>
+	
+	
+		<mkdir dir="deploy" />
+		<!-- Need to use ${basedir} because somehow the ant task is calculating the directory differently -->
+		<fx:deploy
+			embedJNLP="false"
+			extension="false"
+			includeDT="false"
+			verbose="true"
+			offlineAllowed="true"
+			outdir="${basedir}/deploy"
+			outfile="TaggingApp" nativeBundles="exe"
+			updatemode="background" >
+	
+			<fx:platform basedir="${java.home}"/>
+			<fx:info title="TaggingApp" vendor="fer.hr.telegra"/>
+	
+			<fx:application refId="fxApplication"/>
+			<fx:resources refid="appRes"/>
+		</fx:deploy>
+	
+	
+	</target>
+</project>
