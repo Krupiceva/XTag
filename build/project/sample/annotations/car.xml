@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <annotation verified="no">
   <folder>images</folder>
-  <filename>truck.jpg</filename>
-  <path>C:\Program Files\XTag\app\sample\images\truck.jpg</path>
+  <filename>car.jpg</filename>
+  <path>sample\images\car.jpg</path>
   <source>
     <database>Unknown</database>
   </source>
   <size>
-    <width>1200</width>
-    <height>718</height>
+    <width>960</width>
+    <height>640</height>
     <depth>3</depth>
   </size>
   <segmented>0</segmented>
   <object>
-    <name>truck</name>
+    <name>car</name>
     <text/>
     <pose>Unspecified</pose>
     <truncated>0</truncated>
     <difficult>0</difficult>
     <overlap>0</overlap>
+    <aspect_ratio>0.0</aspect_ratio>
     <bndbox>
-      <xmin>156</xmin>
-      <ymin>123</ymin>
-      <xmax>1056</xmax>
-      <ymax>567</ymax>
+      <xmin>83</xmin>
+      <ymin>128</ymin>
+      <xmax>894</xmax>
+      <ymax>568</ymax>
     </bndbox>
   </object>
 </annotation>

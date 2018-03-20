@@ -17,14 +17,17 @@ public class ResizableRectangle extends Rectangle {
     private double rectangleStartY;
     private double mouseClickPozX;
     private double mouseClickPozY;
+    private double aspectRatio;
     private static final double RESIZER_SQUARE_SIDE = 8;
     private Paint resizerSquareColor = Color.WHITE;
     private Paint rectangleStrokeColor = Color.BLUE;
     private ImageView imageView;
 
-    public ResizableRectangle(double x, double y, double width, double height, Group group, ObservableList<ResizableRectangleWrapper> annotations, TableView<ResizableRectangleWrapper> annotationsTable, ImageView imageView, MainApp mainApp) {
+    public ResizableRectangle(double x, double y, double width, double height, double aspectRatio, Group group, ObservableList<ResizableRectangleWrapper> annotations, TableView<ResizableRectangleWrapper> annotationsTable, ImageView imageView, MainApp mainApp) {
     	super(x,y,width,height);
+    	//super.widthProperty().bindBidirectional(super.heightProperty());
         this.imageView = imageView;
+        this.aspectRatio = aspectRatio;
         group.getChildren().add(this);
         super.setStroke(rectangleStrokeColor);
         super.setStrokeWidth(1);
@@ -90,7 +93,6 @@ public class ResizableRectangle extends Rectangle {
             double offsetY = event.getY() - mouseClickPozY;
             double newX = super.getX() + offsetX ;
             double newY = super.getY() + offsetY ;
-
             if (newX >= 0 && newX + super.getWidth() <= imageView.getFitWidth() ) {
                 super.setX(newX);
             }
@@ -136,14 +138,29 @@ public class ResizableRectangle extends Rectangle {
             double newX = super.getX() + offsetX ;
             double newY = super.getY() + offsetY ;
 
-            if (newX >= 0 && newX <= super.getX() + super.getWidth() ) {
-                super.setX(newX);
-                super.setWidth(super.getWidth() - offsetX);
+            if(aspectRatio != 0) {
+            	if (newX >= 0 && newX <= super.getX() + super.getWidth() ) {
+            		offsetY = offsetX / aspectRatio;
+            		if (super.getY() + offsetY > 0) {
+		                super.setX(newX);
+		                super.setWidth(super.getWidth() - offsetX);
+		                
+		                newY = super.getY() + offsetY ;
+		                super.setY(newY);
+		                super.setHeight(super.getWidth()/aspectRatio);
+            		}
+	            }
             }
-
-            if (newY >= 0 && newY <= super.getY() + super.getHeight() ) {
-                super.setY(newY);
-                super.setHeight(super.getHeight() - offsetY);
+            else {
+	            if (newX >= 0 && newX <= super.getX() + super.getWidth() ) {
+	                super.setX(newX);
+	                super.setWidth(super.getWidth() - offsetX);
+	            }
+	
+	            if (newY >= 0 && newY <= super.getY() + super.getHeight() ) {
+	                super.setY(newY);
+	                super.setHeight(super.getHeight() - offsetY);
+	            }
             }
 
         });
@@ -166,9 +183,20 @@ public class ResizableRectangle extends Rectangle {
             double offsetX = event.getX() - rectangleStartX;
             double newX = super.getX() + offsetX;
 
-            if (newX >= 0 && newX <= super.getX() + super.getWidth() - 5) {
-                super.setX(newX);
-                super.setWidth(super.getWidth() - offsetX);
+            if(aspectRatio != 0) {
+            	 if (newX >= 0 && newX <= super.getX() + super.getWidth() - 5) {
+            		 if(super.getY() + (super.getWidth() - offsetX)/aspectRatio <= imageView.getFitHeight()) {
+	 	                super.setX(newX);
+	 	                super.setWidth(super.getWidth() - offsetX);
+	 	                super.setHeight(super.getWidth()/aspectRatio);
+            		 }
+ 	            }
+            }
+            else {
+	            if (newX >= 0 && newX <= super.getX() + super.getWidth() - 5) {
+	                super.setX(newX);
+	                super.setWidth(super.getWidth() - offsetX);
+	            }
             }
 
         });
@@ -194,13 +222,24 @@ public class ResizableRectangle extends Rectangle {
             double offsetY = event.getY() - rectangleStartY;
             double newX = super.getX() + offsetX;
 
-            if (newX >= 0 && newX <= super.getX() + super.getWidth() - 5) {
-                super.setX(newX);
-                super.setWidth(super.getWidth() - offsetX);
+            
+            if(aspectRatio != 0) {
+            	if (newX >= 0 && newX <= super.getX() + super.getWidth() - 5) {
+            		if(super.getY() + (super.getWidth() - offsetX)/aspectRatio <= imageView.getFitHeight()) {
+	                    super.setX(newX);
+	                    super.setWidth(super.getWidth() - offsetX);
+	                    super.setHeight(super.getWidth()/aspectRatio);
+            		}
+                }
             }
-
-            if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight() ) {
-                super.setHeight(offsetY);
+            else {
+            	if (newX >= 0 && newX <= super.getX() + super.getWidth() - 5) {
+                    super.setX(newX);
+                    super.setWidth(super.getWidth() - offsetX);
+                }
+            	if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight() ) {
+            		super.setHeight(offsetY);
+            	}
             }
         });
     }
@@ -220,13 +259,24 @@ public class ResizableRectangle extends Rectangle {
         prepareResizerSquare(squareSC);
 
         squareSC.addEventHandler(MouseEvent.MOUSE_DRAGGED,event -> {
+            rectangleStartX = super.getX();
             rectangleStartY = super.getY();
+            
             double offsetY = event.getY() - rectangleStartY;
 
-            if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight()) {
-                super.setHeight(offsetY);
+            if(aspectRatio != 0) {
+            	if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight()) {
+            		if(super.getX() + offsetY*aspectRatio <= imageView.getFitWidth()) {
+		                super.setHeight(offsetY);
+		                super.setWidth(super.getHeight()*aspectRatio);
+            		}
+	            }
             }
-
+            else {
+	            if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight()) {
+	                super.setHeight(offsetY);
+	            }
+            }
         });
     }
 
@@ -249,12 +299,22 @@ public class ResizableRectangle extends Rectangle {
             double offsetX = event.getX() - rectangleStartX;
             double offsetY = event.getY() - rectangleStartY;
 
-            if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
-                super.setWidth(offsetX);
+            if(aspectRatio != 0) {
+            	if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
+            		if(super.getY() + offsetX/aspectRatio <= imageView.getFitHeight()) {
+		                super.setWidth(offsetX);
+		                super.setHeight(super.getWidth()/aspectRatio);
+            		}
+	            }
             }
-
-            if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight()) {
-                super.setHeight(offsetY);
+            else {
+	            if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
+	                super.setWidth(offsetX);
+	            }
+	
+	            if (offsetY >= 0 && offsetY + super.getY() <= imageView.getFitHeight()) {
+	                super.setHeight(offsetY);
+	            }
             }
         });
     }
@@ -275,8 +335,18 @@ public class ResizableRectangle extends Rectangle {
         squareCE.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             rectangleStartX = super.getX();
             double offsetX = event.getX() - rectangleStartX;
-            if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
-                super.setWidth(offsetX);
+            if(aspectRatio != 0) {
+            	if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
+            		if(super.getY() + offsetX/aspectRatio <= imageView.getFitHeight()) {
+		                super.setWidth(offsetX);
+		                super.setHeight(super.getWidth()/aspectRatio);
+            		}
+	            }
+            }
+            else {
+	            if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
+	                super.setWidth(offsetX);
+	            }
             }
 
         });
@@ -302,13 +372,24 @@ public class ResizableRectangle extends Rectangle {
             double offsetY = event.getY() - rectangleStartY;
             double newY = super.getY() + offsetY ;
 
-            if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
-                super.setWidth(offsetX);
+            if(aspectRatio != 0) {
+            	if (newY >= 0 && newY <= super.getY() + super.getHeight() - 5) {
+            		if(super.getX() + (super.getHeight() - offsetY)*aspectRatio <= imageView.getFitWidth()) {
+		                super.setY(newY);
+		                super.setHeight(super.getHeight() - offsetY);
+		                super.setWidth(super.getHeight()*aspectRatio);
+            		}
+	            }
             }
-
-            if (newY >= 0 && newY <= super.getY() + super.getHeight() - 5) {
-                super.setY(newY);
-                super.setHeight(super.getHeight() - offsetY);
+            else {
+	            if (offsetX >= 0 && offsetX + super.getX() <= imageView.getFitWidth()) {
+	                super.setWidth(offsetX);
+	            }
+	
+	            if (newY >= 0 && newY <= super.getY() + super.getHeight() - 5) {
+	                super.setY(newY);
+	                super.setHeight(super.getHeight() - offsetY);
+	            }
             }
 
         });
@@ -333,9 +414,20 @@ public class ResizableRectangle extends Rectangle {
             double offsetY = event.getY() - rectangleStartY;
             double newY = super.getY() + offsetY ;
 
-            if (newY >= 0 && newY <= super.getY() + super.getHeight()) {
-                super.setY(newY);
-                super.setHeight(super.getHeight() - offsetY);
+            if(aspectRatio != 0) {
+            	if (newY >= 0 && newY <= super.getY() + super.getHeight()) {
+            		if(super.getX() + (super.getHeight() - offsetY)*aspectRatio <= imageView.getFitWidth()) {
+		                super.setY(newY);
+		                super.setHeight(super.getHeight() - offsetY);
+		                super.setWidth(super.getHeight()*aspectRatio);
+            		}
+	            }
+            }
+            else {
+	            if (newY >= 0 && newY <= super.getY() + super.getHeight()) {
+	                super.setY(newY);
+	                super.setHeight(super.getHeight() - offsetY);
+	            }
             }
 
         });
@@ -348,6 +440,8 @@ public class ResizableRectangle extends Rectangle {
                 rect.getParent().setCursor(Cursor.DEFAULT));
     }
 
-
+    public double getAspectRatio() {
+    	return aspectRatio;
+    }
 	
 }

@@ -1,11 +1,7 @@
 package fer.hr.telegra.view;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 
@@ -18,13 +14,10 @@ import org.bytedeco.javacv.Java2DFrameConverter;
 
 import fer.hr.telegra.MainApp;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -162,9 +155,11 @@ public class ExportFramesDialogController {
 					int i = 0;
 					int limit = Integer.valueOf(maxNumberOfImages.getText());
 					writeLog("Exporting started...\nPlease wait...");
+					System.out.println(g.getLengthInFrames());
 					if (limit > g.getLengthInFrames() / frameNum) {
 						limit = g.getLengthInFrames() / frameNum;
 					}
+					//TODO napravit za avije bez duljine :D
 					while (j < limit) {
 						System.out.print(j);
 						frame = g.grab();
@@ -172,6 +167,7 @@ public class ExportFramesDialogController {
 							Java2DFrameConverter cnvrt = new Java2DFrameConverter();
 							BufferedImage bImage = cnvrt.convert(frame);
 							if (bImage == null) {
+								System.out.println("null je");
 								break;
 							}
 							String path = exportLocation.getText() + "\\" + imagePrefix.getText() + j + ".jpg";
@@ -214,7 +210,8 @@ public class ExportFramesDialogController {
     	}
     	else{
     		try{
-    			  int num = Integer.parseInt(frames.getText());
+    			  @SuppressWarnings("unused")
+				int num = Integer.parseInt(frames.getText());
     		} catch (NumberFormatException e) {
     			  errorMessage += "No valid each frames number!\n";
     		}
@@ -227,7 +224,8 @@ public class ExportFramesDialogController {
     	}
     	else {
     		try{
-  			  int num = Integer.parseInt(maxNumberOfImages.getText());
+  			  @SuppressWarnings("unused")
+			int num = Integer.parseInt(maxNumberOfImages.getText());
   		} catch (NumberFormatException e) {
   			  errorMessage += "No valid max number of images!\n";
   		}

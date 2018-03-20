@@ -1,7 +1,7 @@
 package fer.hr.telegra.model;
 
 public enum ImageQuality {
-	Unknown, Blurry, Sharp;
+	Unknown, Blurry, Sharp, Mix;
 	
 	public static String printImageQuality(ImageQuality quality) {
 		String stringQuality;
@@ -13,6 +13,8 @@ public enum ImageQuality {
 			case Blurry:	stringQuality = "Blurry";
 							break;
 			case Sharp:		stringQuality = "Sharp";
+							break;
+			case Mix:		stringQuality = "Mix";
 							break;
 			default:		stringQuality = "Unknown";
 							break;

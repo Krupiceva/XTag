@@ -2,23 +2,16 @@ package fer.hr.telegra.view;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ImageQuality;
+import fer.hr.telegra.model.TimeOfTheDay;
 import fer.hr.telegra.model.WeatherConditions;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
@@ -29,12 +22,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ButtonType;
 
 public class DataSetsOverviewController {
@@ -62,6 +55,8 @@ public class DataSetsOverviewController {
 	private Label weatherConditionLabel;
 	@FXML
 	private Label imageQualityLabel;
+	@FXML
+	private Label timeOfTheDayLabel;
 	@FXML
 	private SplitPane splitPaneHor;
 	@FXML
@@ -98,7 +93,7 @@ public class DataSetsOverviewController {
     private void initialize() {
     	splitPaneHor.setDividerPositions(0.15); 
     	dataSetNameColumn.setCellValueFactory(cellData -> cellData.getValue().dataSetNameProperty());
-    	numOfImgColumn.setCellValueFactory(cellData -> cellData.getValue().numOfImgInDataSetProperty().asObject());
+    	numOfImgColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getDataSetImages().size() + cellData.getValue().getDataSetImagesWithAnnotations().size() + cellData.getValue().getDataSetVerifiedImages().size()).asObject());
     	
     	//Add icons to buttons and labels
     	Image imageOpen = new Image(getClass().getResourceAsStream("/Actions-project-open-icon.png"));
@@ -116,6 +111,13 @@ public class DataSetsOverviewController {
     	
     	//clear dataset details
     	showDataSetDetails(null);
+    	
+    	dataSetTable.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+    		if(event.getClickCount() == 2) {
+     		   handleOpen();
+     	   }
+    	});
+    	
     	
     	//Listen for change and show selected dataset
     	dataSetTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showDataSetDetails(newValue));
@@ -171,11 +173,12 @@ public class DataSetsOverviewController {
     		dataSetNameLabel.setText(dataSet.getDataSetName());
     		dataSetImagesLocationLabel.setText(dataSet.getDataSetImagesLocation());
     		dataSetAnnotationsLocationLabel.setText(dataSet.getDataSetAnnotationsLocation());
-    		numOfImgLabel.setText(Integer.toString(dataSet.getNumOfImgInDataSet()));
+    		numOfImgLabel.setText(Integer.toString(dataSet.getDataSetImages().size() + dataSet.getDataSetImagesWithAnnotations().size() + dataSet.getDataSetVerifiedImages().size()));
     		cameraAngleLabel.setText(Double.toString(dataSet.getCameraAngle()));
     		cameraHighLabel.setText(Double.toString(dataSet.getCameraHigh()));
     		weatherConditionLabel.setText(WeatherConditions.printWeatherConditions(dataSet.getWeatherCondition()));
     		imageQualityLabel.setText(ImageQuality.printImageQuality(dataSet.getImageQuality()));
+    		timeOfTheDayLabel.setText(TimeOfTheDay.printTimeOfTheDay(dataSet.getTimeOfTheDay()));
     		
     	}
     	else {
@@ -187,6 +190,7 @@ public class DataSetsOverviewController {
     		cameraHighLabel.setText("");
     		weatherConditionLabel.setText("");
     		imageQualityLabel.setText("");
+    		timeOfTheDayLabel.setText("");
     	}
     }
     
@@ -207,6 +211,8 @@ public class DataSetsOverviewController {
     		if (result.get() == ButtonType.OK) {
     			
     			mainApp.getDataSets().remove(selectedDataSet);
+    			File file = MainApp.getLastFilePath();
+    	        mainApp.saveDataSetsToFile(file);
     		}
     		else {
     			alert.close();
@@ -236,6 +242,8 @@ public class DataSetsOverviewController {
     	boolean okClicked = mainApp.showDataSetAddDialog(tempDataSet);
     	if(okClicked) {
     		mainApp.getDataSets().add(tempDataSet);
+    		File file = MainApp.getLastFilePath();
+            mainApp.saveDataSetsToFile(file);
     	}
     }
     
@@ -249,6 +257,8 @@ public class DataSetsOverviewController {
     		boolean okClicked = mainApp.showDataSetEditDialog(selectedDataSet);
     		if (okClicked) {
     			showDataSetDetails(selectedDataSet);
+    			File file = MainApp.getLastFilePath();
+    	        mainApp.saveDataSetsToFile(file);
     		}
     	}
     	else {
@@ -298,26 +308,6 @@ public class DataSetsOverviewController {
     	}
     }
     
-    @FXML
-    private void handleStatistics() {
-    	DataSet selectedDataSet = dataSetTable.getSelectionModel().getSelectedItem();
-    	if(selectedDataSet != null) {
-    		mainApp.showAnnotationsStatistics(selectedDataSet);
-    	}
-    	else {
-    		// Nothing selected.
-            Alert alert = new Alert(AlertType.WARNING);
-            alert.initOwner(mainApp.getPrimaryStage());
-            alert.setTitle("Warning");
-            alert.setHeaderText("No Dataset Selected");
-            alert.setContentText("Please select dataset in the table!");
-
-            alert.showAndWait();
-    		
-    	}
-    	
-    }
-    
     
     // array of supported extensions (use a List if you prefer)
        static final String[] EXTENSIONS = new String[]{
@@ -336,4 +326,5 @@ public class DataSetsOverviewController {
                return (false);
            }
        };
+       
 }

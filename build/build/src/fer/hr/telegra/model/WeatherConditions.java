@@ -1,7 +1,7 @@
 package fer.hr.telegra.model;
 
 public enum WeatherConditions {
-	Unknown, Cloudy, Sunny, Rain;
+	Unknown, Cloudy, Sunny, Rainy, Snowy, Mix;
 	
 	public static String printWeatherConditions(WeatherConditions condition) {
 		String conditionString;
@@ -14,7 +14,11 @@ public enum WeatherConditions {
 							break;
 			case Sunny:		conditionString = "Sunny";
 							break;
-			case Rain:		conditionString = "Rain";
+			case Rainy:		conditionString = "Rainy";
+							break;
+			case Snowy:		conditionString = "Snowy";
+							break;
+			case Mix:		conditionString = "Mix";
 							break;
 			default:		conditionString = "Unknown";
 							break;

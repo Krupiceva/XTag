@@ -30,15 +30,15 @@
          <children>
             <Label text="Name" />
             <Label text="Camera Angle" GridPane.rowIndex="1" />
-            <Label text="Weather Condition" GridPane.rowIndex="2" />
-            <Label text="Camera High" GridPane.rowIndex="3" />
-            <Label text="Image Quality" GridPane.rowIndex="4" />
+            <Label text="Weather Condition" GridPane.rowIndex="4" />
+            <Label text="Camera High" GridPane.rowIndex="2" />
+            <Label text="Image Quality" GridPane.rowIndex="5" />
             <Label text="Annotations location" GridPane.rowIndex="7" />
             <TextField fx:id="nameField" GridPane.columnIndex="1" />
             <TextField fx:id="cameraAngleField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="cameraHighField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <ComboBox fx:id="weatherConditionCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ComboBox fx:id="imageQualityCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="cameraHighField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ComboBox fx:id="weatherConditionCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ComboBox fx:id="imageQualityCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label text="Images location" GridPane.rowIndex="6" />
             <GridPane GridPane.columnIndex="1" GridPane.rowIndex="6">
               <columnConstraints>
@@ -66,6 +66,8 @@
                   <Button mnemonicParsing="false" onAction="#handleBrowse1" text="Browse..." GridPane.columnIndex="1" />
                </children>
             </GridPane>
+            <Label text="Time of the day" GridPane.rowIndex="3" />
+            <ComboBox fx:id="timeOfTheDayCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <ButtonBar buttonMinWidth="100.0" layoutX="186.0" layoutY="238.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="5.0">

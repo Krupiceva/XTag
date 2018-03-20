@@ -8,9 +8,12 @@
             <imageName>truck.jpg</imageName>
         </dataSetImages>
         <dataSetImagesLocation>sample/images</dataSetImagesLocation>
+        <dataSetImagesWithAnnotations>
+            <imageName>car.jpg</imageName>
+        </dataSetImagesWithAnnotations>
         <dataSetName>Test set</dataSetName>
         <imageQuality>Unknown</imageQuality>
-        <numOfImgInDataSet>1</numOfImgInDataSet>
+        <timeOfTheDay>Unknown</timeOfTheDay>
         <weatherCondition>Unknown</weatherCondition>
     </dataSet>
 </dataSets>

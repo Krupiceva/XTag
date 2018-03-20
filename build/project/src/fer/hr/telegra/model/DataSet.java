@@ -3,16 +3,11 @@ package fer.hr.telegra.model;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.Iterator;
+
+import org.magicwerk.brownies.collections.BigList;
 
 import javafx.beans.property.*;
 
@@ -24,16 +19,26 @@ public class DataSet {
 	private final StringProperty dataSetName;
 	private StringProperty dataSetImagesLocation;
 	private StringProperty dataSetAnnotationsLocation;
-	private IntegerProperty numOfImgInDataSet;
 	private DoubleProperty cameraAngle;
 	private DoubleProperty cameraHigh;
 	private ObjectProperty<WeatherConditions> weatherCondition;
 	private ObjectProperty<ImageQuality> imageQuality;
+	private ObjectProperty<TimeOfTheDay> timeOfTheDay;
 	
 	 /**
-     * The data as an observable list of DataImages.
+     * The data as an observable list of DataImages (without annotations);
      */
     private ObservableList<DataImage> dataSetImages = FXCollections.observableArrayList();
+    
+    /**
+     * The data as an observable list of DataImages (with annotations);
+     */
+    private ObservableList<DataImage> dataSetImagesWithAnnotations = FXCollections.observableArrayList();
+    
+    /**
+     * The data as an observable list of DataImages (with annotations and verified);
+     */
+    private ObservableList<DataImage> dataSetVerifiedImages = FXCollections.observableArrayList();
     
 	
 	/**
@@ -52,13 +57,13 @@ public class DataSet {
      */
     public DataSet(String dataSetName) {
     	this.dataSetName = new SimpleStringProperty(dataSetName);
-    	this.numOfImgInDataSet = new SimpleIntegerProperty(0);
     	this.dataSetImagesLocation = new SimpleStringProperty("No Directory selected");
     	this.dataSetAnnotationsLocation = new SimpleStringProperty("No Directory selected");
     	this.cameraAngle = new SimpleDoubleProperty(0);
     	this.cameraHigh = new SimpleDoubleProperty(0);
     	this.weatherCondition = new SimpleObjectProperty<WeatherConditions>(WeatherConditions.Unknown);
     	this.imageQuality = new SimpleObjectProperty<ImageQuality>(ImageQuality.Unknown);
+    	this.timeOfTheDay = new SimpleObjectProperty<TimeOfTheDay>(TimeOfTheDay.Unknown);
     }
     
     //UNAPRIJEDITI SRUSI SE ZA VELIK BROJ SLIKA
@@ -125,19 +130,61 @@ public class DataSet {
     	dataSetImages.add(image);
     }
     
-    
-    public Integer getNumOfImgInDataSet() {
-    	return numOfImgInDataSet.get();
+    public void removeDataSetImage(String imageName) {
+    	BigList<DataImage> images =  BigList.create(dataSetImages);
+    	Iterator<DataImage> itr = images.iterator();
+    	while(itr.hasNext()) {
+    		DataImage img = itr.next();
+    		if (img.getImageName().equals(imageName)) {
+    			dataSetImages.remove(dataSetImages.indexOf(img)); 			
+    		}
+    	}
     }
     
-    public void setNumOfImgInDataSet(Integer numOfImgInDataSet) {
-    	this.numOfImgInDataSet.set(numOfImgInDataSet);
-    	//this.numOfImgInDataSet.set(dataSetImages.size());
-
+    public ObservableList<DataImage> getDataSetImagesWithAnnotations(){
+    	return dataSetImagesWithAnnotations;
     }
     
-    public IntegerProperty numOfImgInDataSetProperty() {
-    	return numOfImgInDataSet;
+    public void setDataSetImagesWithAnnotations(ObservableList<DataImage> images) {
+    	this.dataSetImagesWithAnnotations = images;
+    }
+    
+    public void addDataSetImageWithAnnotations(DataImage image) {
+    	dataSetImagesWithAnnotations.add(image);
+    }
+    
+    public void removeDataSetImageWithAnnotations(String imageName) {
+    	BigList<DataImage> images =  BigList.create(dataSetImagesWithAnnotations);
+    	Iterator<DataImage> itr = images.iterator();
+    	while(itr.hasNext()) {
+    		DataImage img = itr.next();
+    		if (img.getImageName().equals(imageName)) {
+    			dataSetImagesWithAnnotations.remove(dataSetImagesWithAnnotations.indexOf(img)); 			
+    		}
+    	}
+    }
+    
+    public ObservableList<DataImage> getDataSetVerifiedImages(){
+    	return dataSetVerifiedImages;
+    }
+    
+    public void setDataSetVerifiedImages(ObservableList<DataImage> images) {
+    	this.dataSetVerifiedImages = images;
+    }
+    
+    public void addDataSetVerifiedImage(DataImage image) {
+    	dataSetVerifiedImages.add(image);
+    }
+    
+    public void removeDataSetVerifiedImage(String imageName) {
+    	BigList<DataImage> images =  BigList.create(dataSetVerifiedImages);
+    	Iterator<DataImage> itr = images.iterator();
+    	while(itr.hasNext()) {
+    		DataImage img = itr.next();
+    		if (img.getImageName().equals(imageName)) {
+    			dataSetVerifiedImages.remove(dataSetVerifiedImages.indexOf(img)); 			
+    		}
+    	}
     }
     
     public Double getCameraAngle() {
@@ -188,4 +235,15 @@ public class DataSet {
     	return imageQuality;
     }
     
+    public TimeOfTheDay getTimeOfTheDay() {
+    	return timeOfTheDay.get();
+    }
+    
+    public void setTimeOfTheDay(TimeOfTheDay timeOfTheDay) {
+    	this.timeOfTheDay.set(timeOfTheDay);
+    }
+    
+    public ObjectProperty<TimeOfTheDay> timeOfTheDayProperty(){
+    	return timeOfTheDay;
+    }
 }

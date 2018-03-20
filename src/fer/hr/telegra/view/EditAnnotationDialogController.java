@@ -1,23 +1,13 @@
 package fer.hr.telegra.view;
 
 import fer.hr.telegra.MainApp;
-import fer.hr.telegra.model.DataSet;
-import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -35,17 +25,8 @@ public class EditAnnotationDialogController {
 	@FXML
 	private CheckBox overlap;
 	private Stage dialogStage;
-	private ResizableRectangle rectangle;
 	private ResizableRectangleWrapper rectangleWrapper;
-	private Integer index;
-	// Reference to the main application.
-    private MainApp mainApp;
-    private boolean okClicked = false;
-    private ToggleGroup group = new ToggleGroup();
-    private static final double INIT_VALUE = 0;
-    public static final ObservableList<RadioButton> namesRadioButtons = FXCollections.observableArrayList();
-    
-    private ObservableList<ResizableRectangleWrapper> annotations = FXCollections.observableArrayList();
+	private boolean okClicked = false;
     
     public EditAnnotationDialogController() {}
 	
@@ -102,6 +83,9 @@ public class EditAnnotationDialogController {
                 else if (event.getCode() == KeyCode.NUMPAD9 || event.getCode() == KeyCode.DIGIT9) {
                 	listOfAnnotations.getSelectionModel().select(8);
                 }
+                else if (event.getCode() == KeyCode.ENTER) {
+                	handleOK();
+                }
                 
             }
         });
@@ -109,10 +93,9 @@ public class EditAnnotationDialogController {
     
     
     public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
         listOfAnnotations.setEditable(true);
         listOfAnnotations.setItems(mainApp.getAnnotations());
-        listOfAnnotations.setCellFactory(param -> new RadioListCell());
+        //listOfAnnotations.setCellFactory(param -> new RadioListCell());
     }
     
     
@@ -126,11 +109,9 @@ public class EditAnnotationDialogController {
     }
     
     public void setIndex(Integer index) {
-    	this.index = index;
     }
     
     public void setAnnotation(ObservableList<ResizableRectangleWrapper> annotations) {
-    	this.annotations = annotations;
     }
     
     /**
@@ -160,50 +141,5 @@ public class EditAnnotationDialogController {
     	rectangleWrapper.setOverlap(overlap.isSelected());
     	okClicked = true;
     	dialogStage.close();
-    }
-    
-    /**
-     * subclass for creating a custom ListCell
-     * the graphic of the ListCell to RadioButton
-     *
-     */
-    private class RadioListCell extends ListCell<String> {
-
-        RadioButton radioButton;
-        ChangeListener<Boolean> radioListener = (src, ov, nv) -> radioChanged(nv);
-        WeakChangeListener<Boolean> weakRadioListener = new WeakChangeListener(radioListener);
-
-        public RadioListCell() {
-            radioButton = new RadioButton();
-            radioButton.selectedProperty().addListener(weakRadioListener);
-            radioButton.setFocusTraversable(false);
-            // let it span the complete width of the list
-            // needed in fx8 to update selection state
-            // Still not full coverage
-            radioButton.maxWidthProperty().bind(widthProperty());
-            radioButton.maxHeightProperty().bind(heightProperty());
-            //radioButton.setMaxWidth(Double.MAX_VALUE);
-        }
-
-        protected void radioChanged(boolean selected) {
-            if (selected && getListView() != null && !isEmpty() && getIndex() >= 0) {
-                getListView().getSelectionModel().select(getIndex());
-            }
-        }
-
-        @Override
-        public void updateItem(String obj, boolean empty) {
-            super.updateItem(obj, empty);
-            if (empty) {
-                setText(null);
-                setGraphic(null);
-                radioButton.setToggleGroup(null);
-            } else {
-                radioButton.setText(obj);
-                radioButton.setToggleGroup(group);
-                radioButton.setSelected(isSelected());
-                setGraphic(radioButton);
-            }
-        }
     }
 }

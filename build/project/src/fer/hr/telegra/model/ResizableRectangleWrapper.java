@@ -18,6 +18,7 @@ public class ResizableRectangleWrapper {
 	private BooleanProperty isTruncated;
 	private BooleanProperty isDifficult;
 	private BooleanProperty isOverlap;
+	private DoubleProperty aspectRatio;
 	private IntegerProperty xMin;
 	private IntegerProperty yMin;
 	private IntegerProperty xMax;
@@ -49,7 +50,7 @@ public class ResizableRectangleWrapper {
 		heightProp.bind(rectangle.heightProperty());
 		xMax.bind(rectangle.xProperty().add(widthProp));
 		yMax.bind(rectangle.yProperty().add(heightProp));
-		
+		this.aspectRatio = new SimpleDoubleProperty(this.rectangle.getAspectRatio());
 		
 	}
 	
@@ -175,5 +176,17 @@ public class ResizableRectangleWrapper {
 	
 	public IntegerProperty indexProperty() {
 		return index;
+	}
+	
+	public Double getAspectRatio() {
+		return aspectRatio.get();
+	}
+	
+	public void setAspectRatio(Double aspectRatio) {
+		this.aspectRatio.set(aspectRatio);
+	}
+	
+	public DoubleProperty aspectRatioProperty() {
+		return aspectRatio;
 	}
 }

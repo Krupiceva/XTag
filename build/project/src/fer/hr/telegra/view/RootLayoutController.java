@@ -41,7 +41,7 @@ public class RootLayoutController {
     @FXML
     private void handleNewDataBase() {
     	mainApp.getDataSets().clear();
-    	mainApp.setLastFilePath(null);
+    	MainApp.setLastFilePath(null);
     }
     
     /**
@@ -69,7 +69,7 @@ public class RootLayoutController {
      */
     @FXML
     private void handleSaveDataBase() {
-    	File file = mainApp.getLastFilePath();
+    	File file = MainApp.getLastFilePath();
     	if(file != null) {
     		mainApp.saveDataSetsToFile(file);
     	}

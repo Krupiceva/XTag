@@ -1,40 +1,22 @@
 package fer.hr.telegra.view;
 
-import java.text.NumberFormat;
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.Property;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
-import javafx.beans.property.SimpleIntegerProperty;
 
 public class AnnotateDialogController {
 	@FXML
@@ -56,16 +38,11 @@ public class AnnotateDialogController {
 	@FXML
 	private CheckBox overlap;
 	private Stage dialogStage;
-	private DataSet dataSet;
 	private Group imageGroup;
 	private ResizableRectangle rectangle;
 	private ResizableRectangleWrapper rectangleWrapper;
 	private Integer index;
-	// Reference to the main application.
-    private MainApp mainApp;
     private boolean okClicked = false;
-    private ToggleGroup group = new ToggleGroup();
-    private static final double INIT_VALUE = 0;
     public static final ObservableList<RadioButton> namesRadioButtons = FXCollections.observableArrayList();
     
 	public AnnotateDialogController() {
@@ -104,7 +81,11 @@ public class AnnotateDialogController {
         this.dialogStage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if(event.getCode() == KeyCode.Q) {
+            	if (event.getCode() == KeyCode.ENTER) {
+                	System.out.println("stisno enter");
+                	handleOK();
+                }
+            	else if(event.getCode() == KeyCode.Q) {
                 	difficult.setSelected(!difficult.isSelected());
                 }
                 else if(event.getCode() == KeyCode.W) {
@@ -141,19 +122,18 @@ public class AnnotateDialogController {
                 	listOfAnnotations.getSelectionModel().select(8);
                 }
                 
+                
             }
         });
     }
     
     public void setDataSet (DataSet dataSet) {
-    	this.dataSet = dataSet;
     }
     
     public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
         listOfAnnotations.setEditable(true);
         listOfAnnotations.setItems(mainApp.getAnnotations());
-        listOfAnnotations.setCellFactory(param -> new RadioListCell());
+        //listOfAnnotations.setCellFactory(param -> new RadioListCell());
     }
     
     public void setImageGroup(Group imageGroup) {
@@ -194,7 +174,11 @@ public class AnnotateDialogController {
     @FXML
     private void handleOK() {
     	rectangleWrapper = new ResizableRectangleWrapper(rectangle, index);
-    	rectangleWrapper.setKlass(listOfAnnotations.getSelectionModel().getSelectedItem());
+    	String className = listOfAnnotations.getSelectionModel().getSelectedItem();
+    	if( className == null || className.length() == 0) {
+    		className = "unknown";
+    	}
+    	rectangleWrapper.setKlass(className);
     	rectangleWrapper.setAdditionalText(additionalText.getText());
     	rectangleWrapper.setDifficult(difficult.isSelected());
     	rectangleWrapper.setTruncated(truncated.isSelected());
@@ -202,51 +186,6 @@ public class AnnotateDialogController {
     	okClicked = true;
     	dialogStage.close();
     	
-    }
-    
-    /**
-     * subclass for creating a custom ListCell
-     * the graphic of the ListCell to RadioButton
-     *
-     */
-    private class RadioListCell extends ListCell<String> {
-
-        RadioButton radioButton;
-        ChangeListener<Boolean> radioListener = (src, ov, nv) -> radioChanged(nv);
-        WeakChangeListener<Boolean> weakRadioListener = new WeakChangeListener(radioListener);
-
-        public RadioListCell() {
-            radioButton = new RadioButton();
-            radioButton.selectedProperty().addListener(weakRadioListener);
-            radioButton.setFocusTraversable(false);
-            // let it span the complete width of the list
-            // needed in fx8 to update selection state
-            // Still not full coverage
-            radioButton.maxWidthProperty().bind(widthProperty());
-            radioButton.maxHeightProperty().bind(heightProperty());
-            //radioButton.setMaxWidth(Double.MAX_VALUE);
-        }
-
-        protected void radioChanged(boolean selected) {
-            if (selected && getListView() != null && !isEmpty() && getIndex() >= 0) {
-                getListView().getSelectionModel().select(getIndex());
-            }
-        }
-
-        @Override
-        public void updateItem(String obj, boolean empty) {
-            super.updateItem(obj, empty);
-            if (empty) {
-                setText(null);
-                setGraphic(null);
-                radioButton.setToggleGroup(null);
-            } else {
-                radioButton.setText(obj);
-                radioButton.setToggleGroup(group);
-                radioButton.setSelected(isSelected());
-                setGraphic(radioButton);
-            }
-        }
     }
     
     

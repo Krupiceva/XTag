@@ -5,13 +5,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 
-import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.*;
 
 public class DataSetEditDialogController {
@@ -26,6 +24,8 @@ public class DataSetEditDialogController {
 	private TextField cameraHighField;
 	@FXML
 	private ComboBox<ImageQuality> imageQualityCombo = new ComboBox<>();
+	@FXML
+	private ComboBox<TimeOfTheDay> timeOfTheDayCombo = new ComboBox<>();
 	@FXML
 	private TextField imagesLocationField;
 	@FXML
@@ -44,6 +44,7 @@ public class DataSetEditDialogController {
     private void initialize() {
     	weatherConditionCombo.getItems().setAll(WeatherConditions.values());
     	imageQualityCombo.getItems().setAll(ImageQuality.values());
+    	timeOfTheDayCombo.getItems().setAll(TimeOfTheDay.values());
     }
 
     /**
@@ -72,7 +73,7 @@ public class DataSetEditDialogController {
     	weatherConditionCombo.setValue(dataSet.getWeatherCondition());
     	imageQualityCombo.setValue(dataSet.getImageQuality());
     	cameraHighField.setText(Double.toString(dataSet.getCameraHigh()));
-    	
+    	timeOfTheDayCombo.setValue(dataSet.getTimeOfTheDay());
     }
     
     /**
@@ -97,6 +98,7 @@ public class DataSetEditDialogController {
     		dataSet.setCameraHigh(Double.parseDouble(cameraHighField.getText()));
     		dataSet.setWeatherCondition(weatherConditionCombo.getValue());
     		dataSet.setImageQuality(imageQualityCombo.getValue());
+    		dataSet.setTimeOfTheDay(timeOfTheDayCombo.getValue());
     		/**
     		//Add images from dataset location to dataset
     		if(!locationField.getText().equals("No Directory selected")) {
