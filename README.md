@@ -6,6 +6,7 @@ where I work as a student.
 
 <h2> Version releases </h2>
 *XTag v2.0.0 - in progress
+*You need middle button on mouse to use app or enable "middle button" on trackpad
 <ul>
   <li>Reduced edge rectangles</li>
   <li>New window for annotations configuration:<br>
