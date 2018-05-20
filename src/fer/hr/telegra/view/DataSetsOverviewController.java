@@ -12,22 +12,33 @@ import fer.hr.telegra.model.ImageQuality;
 import fer.hr.telegra.model.TimeOfTheDay;
 import fer.hr.telegra.model.WeatherConditions;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import javafx.scene.control.ButtonType;
 
 public class DataSetsOverviewController {
@@ -72,13 +83,15 @@ public class DataSetsOverviewController {
 	@FXML
 	private Label searchLabel;
 	@FXML
+	private Label numberOfAnnotationsInSetLabel;
+	private Integer numberOfAnnotationsInSet;
+	@FXML
     private BarChart<String, Integer> barChart;
 
     @FXML
     private CategoryAxis xAxis;
     
-    Map<String, Integer> stat = new HashMap<String, Integer>();
-	
+    private ObservableList<String> annotationsName = FXCollections.observableArrayList();
 	// Reference to the main application.
     private MainApp mainApp;
     
@@ -121,6 +134,10 @@ public class DataSetsOverviewController {
     	
     	//Listen for change and show selected dataset
     	dataSetTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showDataSetDetails(newValue));
+    	
+    	barChart.setAnimated(false);
+    	barChart.setLegendVisible(false);
+    	
     }
     
     /**
@@ -180,6 +197,49 @@ public class DataSetsOverviewController {
     		imageQualityLabel.setText(ImageQuality.printImageQuality(dataSet.getImageQuality()));
     		timeOfTheDayLabel.setText(TimeOfTheDay.printTimeOfTheDay(dataSet.getTimeOfTheDay()));
     		
+    		barChart.getData().clear();
+    		annotationsName.clear();
+    		XYChart.Series<String, Integer> series = new XYChart.Series<>();
+    		numberOfAnnotationsInSet = 0;
+    		dataSet.getAnnotations().forEach((k,v) -> {
+    			annotationsName.add(k);
+    			//series.getData().add(new XYChart.Data<>(k,v));
+    			numberOfAnnotationsInSet = numberOfAnnotationsInSet + v;
+    			final XYChart.Data<String, Integer> data = new Data<String, Integer>(k, v);
+//    			 data.nodeProperty().addListener(new ChangeListener<Node>() {
+//    			        @Override public void changed(ObservableValue<? extends Node> ov, Node oldNode, final Node node) {
+//    			          if (node != null) {
+//    			            //setNodeStyle(data);
+//    			            displayLabelForData(data);
+//    			          } 
+//    			        }
+//    			      });
+    			 series.getData().add(data);
+    		});
+    		
+    		xAxis.setCategories(annotationsName);
+    		barChart.getData().add(series);
+    		
+    		
+			for (int i = 0; i < annotationsName.size(); i++) {
+				String lookup = ".data" + i + ".chart-bar";
+				for (Node n : barChart.lookupAll(lookup)) {
+					String color ="";
+					if (mainApp.getAnnotations().contains(annotationsName.get(i))) {
+						color = mainApp.getColorOfClasses().get(annotationsName.get(i)).get().toString();
+					}
+					else {
+						color = mainApp.getDefaultColor().toString();
+					}
+					color = color.substring(2);
+					color = "#" + color;
+					//color = color.substring(0, color.length() - 2);
+					String style = "-fx-bar-fill: " + color + ";";
+					n.setStyle(style);
+				}
+			}
+    		numberOfAnnotationsInSetLabel.setText(numberOfAnnotationsInSet.toString());
+    		
     	}
     	else {
     		dataSetNameLabel.setText("");
@@ -191,6 +251,11 @@ public class DataSetsOverviewController {
     		weatherConditionLabel.setText("");
     		imageQualityLabel.setText("");
     		timeOfTheDayLabel.setText("");
+    		
+    		numberOfAnnotationsInSet = 0;
+    		barChart.getData().clear();
+    		
+    		numberOfAnnotationsInSetLabel.setText("");
     	}
     }
     
@@ -326,5 +391,33 @@ public class DataSetsOverviewController {
                return (false);
            }
        };
+       
+       
+       private void displayLabelForData(XYChart.Data<String, Integer> data) {
+    	   final Node node = data.getNode();
+    	   final Text dataText = new Text(data.getYValue() + "");
+    	   node.parentProperty().addListener(new ChangeListener<Parent>() {
+    	     @Override public void changed(ObservableValue<? extends Parent> ov, Parent oldParent, Parent parent) {
+    	       Group parentGroup = (Group) parent;
+    	       parentGroup.getChildren().add(dataText);
+    	     }
+    	   });
+
+    	   node.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+    	     @Override public void changed(ObservableValue<? extends Bounds> ov, Bounds oldBounds, Bounds bounds) {
+    	       dataText.setLayoutX(
+    	         Math.round(
+    	           bounds.getMinX() + bounds.getWidth() / 2 - dataText.prefWidth(-1) / 2
+    	         )
+    	       );
+    	       dataText.setLayoutY(
+    	         Math.round(
+    	           bounds.getMinY() - dataText.prefHeight(-1) * 0.5
+    	         )
+    	       );
+    	     }
+    	   });
+    	 }
+       
        
 }

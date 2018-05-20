@@ -38,6 +38,7 @@ public class AnnotateDialogController {
 	@FXML
 	private CheckBox overlap;
 	private Stage dialogStage;
+	private MainApp mainApp;
 	private Group imageGroup;
 	private ResizableRectangle rectangle;
 	private ResizableRectangleWrapper rectangleWrapper;
@@ -131,6 +132,7 @@ public class AnnotateDialogController {
     }
     
     public void setMainApp(MainApp mainApp) {
+    	this.mainApp = mainApp;
         listOfAnnotations.setEditable(true);
         listOfAnnotations.setItems(mainApp.getAnnotations());
         //listOfAnnotations.setCellFactory(param -> new RadioListCell());
@@ -176,7 +178,7 @@ public class AnnotateDialogController {
     	rectangleWrapper = new ResizableRectangleWrapper(rectangle, index);
     	String className = listOfAnnotations.getSelectionModel().getSelectedItem();
     	if( className == null || className.length() == 0) {
-    		className = "unknown";
+    		className = mainApp.getDefaultClass();
     	}
     	rectangleWrapper.setKlass(className);
     	rectangleWrapper.setAdditionalText(additionalText.getText());

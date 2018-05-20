@@ -126,6 +126,14 @@ public class RootLayoutController {
     private void handleExportFrames() {
     	mainApp.showExportFramesDialog();
     }
+    
+    /**
+     * Opens annotations config dialog
+     */
+    @FXML
+    private void handleConfigAnnotations() {
+    	mainApp.showConfigAnnotations();
+    }
 
     /**
      * Closes the application.

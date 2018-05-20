@@ -1,0 +1,4 @@
+Truncated : 0x00ff00ff
+Difficult : 0xff00ffff
+Overlap : 0xff0000ff
+Overlap&Truncated : 0x0032ffff

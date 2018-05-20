@@ -1,0 +1,86 @@
+bed : 0x0000001a
+bus : 0x00ff0026
+auto : 0x0000001a
+bicycle : 0xe64d4d33
+toothbrush : 0x0000001a
+aeroplane : 0xffff4d33
+cow : 0x0000001a
+vase : 0x0000001a
+laptop : 0x0000001a
+remote : 0x0000001a
+frisbee : 0x0000001a
+hot dog : 0x0000001a
+tie : 0x0000001a
+mouse : 0x0000001a
+cake : 0x0000001a
+bird : 0x0000001a
+donut : 0x0000001a
+spoon : 0x0000001a
+fire hydrant : 0x0000001a
+bear : 0x0000001a
+train : 0x0000001a
+banana : 0x0000001a
+motorbike : 0x0000001a
+sofa : 0x0000001a
+van : 0xffff0026
+suitcase : 0x0000001a
+bench : 0x0000001a
+baseball bat : 0x0000001a
+sink : 0x0000001a
+stop sign : 0x0000001a
+night vehicle : 0x0000001a
+clock : 0x0000001a
+horse : 0x0000001a
+baseball glove : 0x0000001a
+knife : 0x0000001a
+toilet : 0x0000001a
+person : 0x0000001a
+giraffe : 0x0000001a
+skis : 0x0000001a
+dog : 0x0000001a
+elephant : 0x0000001a
+refrigerator : 0x0000001a
+hair drier : 0x0000001a
+snowboard : 0x0000001a
+cup : 0x0000001a
+skateboard : 0x0000001a
+surfboard : 0x0000001a
+truck : 0xff000026
+book : 0x0000001a
+broccoli : 0x0000001a
+parking meter : 0x0000001a
+pottedplant : 0x0000001a
+bottle : 0x0000001a
+bowl : 0x0000001a
+diningtable : 0x0000001a
+cell phone : 0x0000001a
+unknown : 0x0000001a
+trailer : 0x0000001a
+sports ball : 0x0000001a
+apple : 0x0000001a
+pizza : 0x0000001a
+car : 0x001a8026
+cat : 0x0000001a
+toaster : 0x0000001a
+sheep : 0x0000001a
+microwave : 0x0000001a
+zebra : 0x0000001a
+wine glass : 0x0000001a
+keyboard : 0x0000001a
+oven : 0x0000001a
+umbrella : 0x0000001a
+tvmonitor : 0x0000001a
+chair : 0x0000001a
+pickup : 0xde00ff1a
+sandwich : 0x0000001a
+boat : 0x0000001a
+orange : 0x0000001a
+scissors : 0x0000001a
+handbag : 0x0000001a
+fork : 0x0000001a
+backpack : 0x0000001a
+teddy bear : 0x0000001a
+kite : 0x0000001a
+tennis racket : 0x0000001a
+traffic light : 0x0000001a
+carrot : 0x0000001a

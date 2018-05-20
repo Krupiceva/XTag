@@ -24,6 +24,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.magicwerk.brownies.collections.BigList;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import fer.hr.telegra.model.*;
 
@@ -344,6 +347,27 @@ public class DataSetAddDialogController {
 						} else {
 							dataSet.addDataSetImageWithAnnotations(dataImg);
 						}
+						
+						//PROBA
+						
+						NodeList nList = doc.getElementsByTagName("object");
+						for (int j = 0; j < nList.getLength(); j++) {
+							Node nNode = nList.item(j);
+							if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+								Element eElement = (Element) nNode;
+								String name = eElement.getElementsByTagName("name").item(0).getTextContent().trim();
+								if(dataSet.getAnnotations().containsKey(name)) {
+									int num = dataSet.getAnnotations().get(name);
+									num = num + 1;
+									dataSet.getAnnotations().put(name, num);
+								}
+								else {
+									dataSet.getAnnotations().put(name, 1);
+								}
+							}
+						}
+						//PROBA
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
