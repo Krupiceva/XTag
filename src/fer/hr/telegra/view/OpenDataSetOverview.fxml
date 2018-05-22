@@ -25,7 +25,7 @@
    <children>
       <SplitPane fx:id="splitPaneHor" dividerPositions="0.1502, 0.93" prefHeight="500.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
+          <AnchorPane minWidth="250.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                <children>
                   <SplitPane dividerPositions="0.3024193548387097, 0.5362903225806451, 0.7600806451612904" orientation="VERTICAL" prefHeight="498.0" prefWidth="235.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
@@ -34,7 +34,8 @@
                               <Label fx:id="ann" layoutX="14.0" layoutY="6.0" text="Current Annotations: " AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="70.0">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
-                                 </font></Label>
+                                 </font>
+                              </Label>
                               <TableView fx:id="annotationsTable" layoutX="-42.0" layoutY="-42.0" prefHeight="195.0" prefWidth="115.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="90.0">
                                 <columns>
                                   <TableColumn fx:id="nameColumn" prefWidth="75.0" text="Name" />
@@ -48,16 +49,17 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <Button fx:id="backButton" layoutX="9.0" layoutY="5.0" mnemonicParsing="false" onAction="#handleBack" text="Back" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </Button>
                               <Label fx:id="numberOfAnnotationsInSetLabel" layoutX="36.0" layoutY="9.0" text="Total annotations in set: " AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="9.0">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
+                              <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="Back" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <CheckBox fx:id="editModeCheckBox" layoutX="40.0" layoutY="70.0" mnemonicParsing="false" text="Edit Mode" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="84.0" prefWidth="115.0">
@@ -165,7 +167,7 @@
                      </children>
                   </GridPane>
                </children></AnchorPane>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
+            <AnchorPane minHeight="-Infinity" minWidth="150.0" prefHeight="200.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
                <children>
                   <GridPane layoutX="-49.0" layoutY="53.0" prefHeight="498.0" prefWidth="53.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>

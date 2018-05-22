@@ -187,6 +187,8 @@ public class OpenDataSetOverviewController {
 	private Label legendDifficult;
 	@FXML
 	private Label numberOfAnnotationsInSetLabel;
+	@FXML
+	private CheckBox editModeCheckBox;
 	private Integer numberOfAnnotationsInSet;
 	StackPane imageHolder = new StackPane();
 
@@ -199,6 +201,9 @@ public class OpenDataSetOverviewController {
 	MenuItem annotateMenuItem;
 	MenuItem cropMenuItem;
 	final DoubleProperty zoomProperty = new SimpleDoubleProperty(200);
+	Bounds viewPortLockZoomBounds;
+	boolean lockFlag = true;
+	int brojac = 0;
 
 	ObservableList<String> imgs = FXCollections.observableArrayList();
 	ObservableList<String> imgsWithAnnotations = FXCollections.observableArrayList();
@@ -291,7 +296,9 @@ public class OpenDataSetOverviewController {
 		});
 		// Add listener for which rectangle to select
 		annotationsTable.getSelectionModel().selectedItemProperty()
-				.addListener((observable, oldValue, newValue) -> showRectangle(newValue, oldValue));
+				.addListener((observable, oldValue, newValue) ->{ 
+					showRectangle(newValue, oldValue);
+				});
 		annotationsTable.setPlaceholder(new Label("No annotations"));
 		
 
@@ -406,7 +413,6 @@ public class OpenDataSetOverviewController {
 				} else if (event.getCode() == KeyCode.DELETE) {
 					if (annotationsTable.getSelectionModel().getSelectedItem() != null
 							&& !deleteButton.disabledProperty().get()) {
-						System.out.println("delete button pressed");
 						handleDeleteButton();
 					}
 				}
@@ -729,7 +735,7 @@ public class OpenDataSetOverviewController {
 	 */
 	private void showImage(String imageName) {
 		if (imageName == null) {
-			clearSelection(imageGroup);
+			//clearSelection(imageGroup);
 			imageView.setImage(null);
 			return;
 		}
@@ -768,7 +774,7 @@ public class OpenDataSetOverviewController {
 			showAnnotations(imageName);
 			if(!lockZoomLevel.isSelected()) {
 				handleFitZoomToScreenButton();
-			}
+			}		
 			stream.close();
 			System.gc();
 
@@ -807,11 +813,11 @@ public class OpenDataSetOverviewController {
 		scroller.setPannable(true);
 		scroller.setContent(scrollContent);
 
-		System.out.println("MinWidthProperty before: " + zoomPane.minWidthProperty().get());
+		//System.out.println("MinWidthProperty before: " + zoomPane.minWidthProperty().get());
 		zoomPane.minWidthProperty().bind(Bindings.createDoubleBinding(() -> scroller.getViewportBounds().getWidth(), scroller.viewportBoundsProperty()));
 
 		zoomPane.minHeightProperty().bind(Bindings.createDoubleBinding(() -> scroller.getViewportBounds().getHeight(), scroller.viewportBoundsProperty()));
-		System.out.println("MinWidthProperty after: " + zoomPane.minWidthProperty().get());
+		//System.out.println("MinWidthProperty after: " + zoomPane.minWidthProperty().get());
 //		scroller.viewportBoundsProperty().addListener(new ChangeListener<Bounds>() {
 //			@Override
 //			public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
@@ -836,11 +842,32 @@ public class OpenDataSetOverviewController {
 			rectangleWrapperNew.getRectangle().setFill(Color.WHITE.deriveColor(0, 1.2, 1, 0.2));
 		}
 		if (rectangleWrapperOld != null) {
-			rectangleWrapperOld.getRectangle().setFill(mainApp.getColorOfClasses().get(rectangleWrapperOld.getKlass()).get());
-			
+			rectangleWrapperOld.getRectangle()
+					.setFill(mainApp.getColorOfClasses().get(rectangleWrapperOld.getKlass()).get());
+
 		}
 		editButton.setDisable(false);
 		deleteButton.setDisable(false);
+		if (editModeCheckBox.isSelected()) {
+			if (rectangleWrapperNew != null) {
+				int index = rectangleWrapperNew.getIndex();
+				int start = index + (index - 1) * 9;
+				int end = start + 10;
+				for (int i = 1; i < imageGroup.getChildren().size(); i++) {
+					if (i >= start && i < end) {
+						imageGroup.getChildren().get(i).setVisible(true);
+					} else {
+						imageGroup.getChildren().get(i).setVisible(false);
+					}
+				}
+				handleEditButton();
+			}
+		}
+		else {
+			for(javafx.scene.Node node: imageGroup.getChildren()) {
+				node.setVisible(true);
+			}
+		}
 	}
 
 	private void showAnnotations(String imageName) {
@@ -982,7 +1009,6 @@ public class OpenDataSetOverviewController {
 
 		updateAnnotations("Minus");
 		int i = annotationsTable.getSelectionModel().getSelectedItem().getIndex();
-		System.out.println(i);
 		int j = i + (i - 1) * 9;
 		imageGroup.getChildren().remove(j, j + 10);
 		annotations.remove(annotationsTable.getSelectionModel().getSelectedItem());
@@ -1102,7 +1128,7 @@ public class OpenDataSetOverviewController {
 		}
 		scroller.setHvalue(scroller.getHmin() + (scroller.getHmax() - scroller.getHmin()) / 2);
 		scroller.setVvalue(scroller.getVmin() + (scroller.getVmax() - scroller.getVmin()) / 2);
-		scroller.layout();
+		//scroller.layout();
 	}
 
 	@FXML
@@ -1329,7 +1355,6 @@ public class OpenDataSetOverviewController {
 			}
 			else {
 				if(annotations.size() == 0 | annotations.isEmpty()) {
-					System.out.println("nema vise anotacija na trenutnoj slici");
 					imgs.add(imageName);
 					DataImage img = new DataImage(imageName);
 					dataSet.addDataSetImage(img);
@@ -1488,9 +1513,12 @@ public class OpenDataSetOverviewController {
 	}
 
 	public void clearSelection(Group group) {
-		// deletes everything except for base container layer
-		group.getChildren().remove(1, group.getChildren().size());
-		index = 0;
+		if (group.getChildren().size() > 1) {
+			// deletes everything except for base container layer
+			System.out.println(group.getChildren().size());
+			group.getChildren().remove(1, group.getChildren().size());
+			index = 0;
+		}
 
 	}
 
@@ -1527,10 +1555,16 @@ public class OpenDataSetOverviewController {
 			if (event.isSecondaryButtonDown()) {
 				System.out.println("desni");
 				isSecondary = true;
+				for(javafx.scene.Node node: imageGroup.getChildren()) {
+					node.setVisible(true);
+				}
 				return;
 			}
 			for (ResizableRectangleWrapper rectWrap : annotations) {
 				rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+			}
+			for(javafx.scene.Node node: imageGroup.getChildren()) {
+				node.setVisible(true);
 			}
 			annotationsTable.getSelectionModel().clearSelection();
 			isSecondary = false;

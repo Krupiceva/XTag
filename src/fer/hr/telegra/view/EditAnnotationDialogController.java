@@ -50,6 +50,9 @@ public class EditAnnotationDialogController {
                 if (event.getCode() == KeyCode.Q) {
                 	difficult.setSelected(!difficult.isSelected());
                 }
+                else if(event.getCode() == KeyCode.R) {
+            		handleOK();
+                }
                 else if (event.getCode() == KeyCode.W) {
                 	overlap.setSelected(!overlap.isSelected());
                 }

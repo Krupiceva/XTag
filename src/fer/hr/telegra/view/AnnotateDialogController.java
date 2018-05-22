@@ -83,8 +83,10 @@ public class AnnotateDialogController {
             @Override
             public void handle(KeyEvent event) {
             	if (event.getCode() == KeyCode.ENTER) {
-                	System.out.println("stisno enter");
                 	handleOK();
+                }
+            	else if(event.getCode() == KeyCode.R) {
+            		handleOK();
                 }
             	else if(event.getCode() == KeyCode.Q) {
                 	difficult.setSelected(!difficult.isSelected());

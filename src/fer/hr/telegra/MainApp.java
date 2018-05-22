@@ -51,7 +51,7 @@ public class MainApp extends Application {
 	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
-	private final String appVersion = "XTag v1.3 ";
+	private final String appVersion = "XTag v2.0.0 ";
 	
 	//Lists of datasets
 	private ObservableList<DataSet> dataSets = FXCollections.observableArrayList();
