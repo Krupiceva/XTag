@@ -2,6 +2,7 @@ package fer.hr.telegra.view;
 
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -9,6 +10,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
@@ -16,6 +19,8 @@ public class EditAnnotationDialogController {
 
 	@FXML
     private ListView<String>  listOfAnnotations;
+	@FXML
+	private ListView<String> listOfColors;
 	@FXML
 	private TextField additionalText;
 	@FXML
@@ -47,8 +52,20 @@ public class EditAnnotationDialogController {
         this.dialogStage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
+            	KeyCombination shift1 = new KeyCodeCombination(KeyCode.DIGIT1, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift2 = new KeyCodeCombination(KeyCode.DIGIT2, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift3 = new KeyCodeCombination(KeyCode.DIGIT3, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift4 = new KeyCodeCombination(KeyCode.DIGIT4, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift5 = new KeyCodeCombination(KeyCode.DIGIT5, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift6 = new KeyCodeCombination(KeyCode.DIGIT6, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift7 = new KeyCodeCombination(KeyCode.DIGIT7, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift8 = new KeyCodeCombination(KeyCode.DIGIT8, KeyCodeCombination.SHIFT_DOWN);
+            	KeyCombination shift9 = new KeyCodeCombination(KeyCode.DIGIT9, KeyCodeCombination.SHIFT_DOWN);
                 if (event.getCode() == KeyCode.Q) {
                 	difficult.setSelected(!difficult.isSelected());
+                }
+                else if(event.getCode() == KeyCode.R) {
+            		handleOK();
                 }
                 else if (event.getCode() == KeyCode.W) {
                 	overlap.setSelected(!overlap.isSelected());
@@ -56,6 +73,33 @@ public class EditAnnotationDialogController {
                 else if (event.getCode() == KeyCode.E) {
                 	truncated.setSelected(!truncated.isSelected());
                 }
+                else if (shift1.match(event)) {
+                	listOfColors.getSelectionModel().select(0);
+				}
+                else if (shift2.match(event)) {
+                	listOfColors.getSelectionModel().select(1);
+				}
+                else if (shift3.match(event)) {
+                	listOfColors.getSelectionModel().select(2);
+				}
+                else if (shift4.match(event)) {
+                	listOfColors.getSelectionModel().select(3);
+				}
+                else if (shift5.match(event)) {
+                	listOfColors.getSelectionModel().select(4);
+				}
+                else if (shift6.match(event)) {
+                	listOfColors.getSelectionModel().select(5);
+				}
+                else if (shift7.match(event)) {
+                	listOfColors.getSelectionModel().select(6);
+				}
+                else if (shift8.match(event)) {
+                	listOfColors.getSelectionModel().select(7);
+				}
+                else if (shift9.match(event)) {
+                	listOfColors.getSelectionModel().select(8);
+				}
                 else if (event.getCode() == KeyCode.NUMPAD1 || event.getCode() == KeyCode.DIGIT1) {
                 	listOfAnnotations.getSelectionModel().select(0);
                 }
@@ -96,6 +140,8 @@ public class EditAnnotationDialogController {
         listOfAnnotations.setEditable(true);
         listOfAnnotations.setItems(mainApp.getAnnotations());
         //listOfAnnotations.setCellFactory(param -> new RadioListCell());
+        listOfColors.setEditable(true);
+        listOfColors.setItems(mainApp.getColors());
     }
     
     
@@ -106,6 +152,7 @@ public class EditAnnotationDialogController {
     	truncated.setSelected(rectangleWrapper.getTruncated());
     	overlap.setSelected(rectangleWrapper.getOverlap());
     	listOfAnnotations.getSelectionModel().select(rectangleWrapper.getKlass());
+    	listOfColors.getSelectionModel().select(rectangleWrapper.getColor());
     }
     
     public void setIndex(Integer index) {
@@ -139,6 +186,7 @@ public class EditAnnotationDialogController {
     	rectangleWrapper.setDifficult(difficult.isSelected());
     	rectangleWrapper.setTruncated(truncated.isSelected());
     	rectangleWrapper.setOverlap(overlap.isSelected());
+    	rectangleWrapper.setColor(listOfColors.getSelectionModel().getSelectedItem());
     	okClicked = true;
     	dialogStage.close();
     }

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <annotation verified="no">
   <folder>images</folder>
-  <filename>car.jpg</filename>
-  <path>sample\images\car.jpg</path>
+  <filename>truck.jpg</filename>
+  <path>sample\images\truck.jpg</path>
   <source>
     <database>Unknown</database>
   </source>
   <size>
-    <width>960</width>
-    <height>640</height>
+    <width>1200</width>
+    <height>718</height>
     <depth>3</depth>
   </size>
   <segmented>0</segmented>
   <object>
-    <name>car</name>
-    <color>Grey</color>
+    <name>truck</name>
+    <color>Blue</color>
     <text/>
     <pose>Unspecified</pose>
     <truncated>0</truncated>
@@ -22,10 +22,10 @@
     <overlap>0</overlap>
     <aspect_ratio>0.0</aspect_ratio>
     <bndbox>
-      <xmin>83</xmin>
-      <ymin>128</ymin>
-      <xmax>894</xmax>
-      <ymax>568</ymax>
+      <xmin>153</xmin>
+      <ymin>85</ymin>
+      <xmax>1042</xmax>
+      <ymax>540</ymax>
     </bndbox>
   </object>
 </annotation>

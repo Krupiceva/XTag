@@ -15,8 +15,11 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -65,6 +68,7 @@ public class DataSetAddDialogController {
 	private DataSet dataSet;
 	private boolean okClicked = false;
 	ImportTask importTask;
+	PathData pathData = PathData.getInstance();
 	
 	/**
      * Initializes the controller class. This method is automatically called
@@ -77,6 +81,7 @@ public class DataSetAddDialogController {
     	imageQualityCombo.getItems().setAll(ImageQuality.values());
     	timeOfTheDayCombo.getItems().setAll(TimeOfTheDay.values());
     	ok.setDisable(true);
+    	cancel.setDisable(true);
     }
 
     /**
@@ -128,6 +133,7 @@ public class DataSetAddDialogController {
     	if (isInputValid()) {
     		importBtn.setDisable(true);
     		ok.setDisable(true);
+    		cancel.setDisable(false);
     		progressBar.setProgress(0);
             progressIndicator.setProgress(0);
             cancel.setDisable(false);
@@ -187,6 +193,10 @@ public class DataSetAddDialogController {
     @FXML
     private void handleBrowse() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = 
                 directoryChooser.showDialog(dialogStage);
     	//LastPath.setLastFilePath(selectedDirectory);
@@ -195,6 +205,14 @@ public class DataSetAddDialogController {
             //locationField.setText("No Directory selected");
         }else{
             imagesLocationField.setText(selectedDirectory.getAbsolutePath());
+            pathData.path = selectedDirectory.getAbsolutePath();
+            try {
+    			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+    			writer.write(pathData.path);
+    		    writer.close();
+    		} catch(IOException e) {
+    			e.printStackTrace();
+    		}
         }
     }
     
@@ -204,6 +222,10 @@ public class DataSetAddDialogController {
     @FXML
     private void handleBrowse1() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = 
                 directoryChooser.showDialog(dialogStage);
     	//LastPath.setLastFilePath(selectedDirectory);
@@ -212,6 +234,14 @@ public class DataSetAddDialogController {
             //locationField.setText("No Directory selected");
         }else{
             annotationsLocationField.setText(selectedDirectory.getAbsolutePath());
+            pathData.path = selectedDirectory.getAbsolutePath();
+            try {
+    			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+    			writer.write(pathData.path);
+    		    writer.close();
+    		} catch(IOException e) {
+    			e.printStackTrace();
+    		}
         }
     }
     

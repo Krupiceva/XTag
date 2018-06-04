@@ -1,8 +1,7 @@
 car
 truck
-bus
 van
+bus
 trailer
 pickup
 unknown
-

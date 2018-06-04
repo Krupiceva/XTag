@@ -9,9 +9,12 @@ import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.security.auth.callback.Callback;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -31,12 +34,18 @@ import org.w3c.dom.NodeList;
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.DataImage;
 import fer.hr.telegra.model.DataSet;
+import fer.hr.telegra.model.ImageQuality;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
 import fer.hr.telegra.model.TooltippedTableCell;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -50,6 +59,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -60,6 +70,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -73,13 +84,16 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 
 public class OpenDataSetOverviewController {
@@ -113,6 +127,7 @@ public class OpenDataSetOverviewController {
 	private TableColumn<ResizableRectangleWrapper, Integer> yMaxColumn;
 	@FXML
 	private ImageView imageView;
+	//ImageView imageView = new ImageView();
 	@FXML
 	private AnchorPane anchorPaneOfImg;
 	@FXML
@@ -136,6 +151,10 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private Button fitZoomButton;
 	@FXML
+	private Button fitToScreenButton;
+	@FXML
+	private CheckBox lockZoomLevel;
+	@FXML
 	private Button saveButton;
 	@FXML
 	private Button backButton;
@@ -143,8 +162,11 @@ public class OpenDataSetOverviewController {
 	private ToggleButton poly;
 	@FXML
 	private Group imageGroup;
+	//Group imageGroup = new Group();
 	@FXML
 	private VBox vBoxOfImg;
+	@FXML
+	private AnchorPane anchorPane;
 	@FXML
 	private CheckBox aspectRatioLock;
 	@FXML
@@ -157,14 +179,33 @@ public class OpenDataSetOverviewController {
 	private Label images;
 	@FXML
 	private Label ann;
+	@FXML
+	private Label legendOverlap;
+	@FXML
+	private Label legendTruncated;
+	@FXML
+	private Label legendOverlapTruncated;
+	@FXML
+	private Label legendDifficult;
+	@FXML
+	private Label numberOfAnnotationsInSetLabel;
+	@FXML
+	private CheckBox editModeCheckBox;
+	private Integer numberOfAnnotationsInSet;
 	StackPane imageHolder = new StackPane();
 
+	//ScrollPane scrollPane = new ScrollPane();
+	ScrollPane scroller = new ScrollPane();
+	
 	Image image;
 	ToggleGroup toggleGroup = new ToggleGroup();;
 	ContextMenu contextMenu;
 	MenuItem annotateMenuItem;
 	MenuItem cropMenuItem;
 	final DoubleProperty zoomProperty = new SimpleDoubleProperty(200);
+	Bounds viewPortLockZoomBounds;
+	boolean lockFlag = true;
+	int brojac = 0;
 
 	ObservableList<String> imgs = FXCollections.observableArrayList();
 	ObservableList<String> imgsWithAnnotations = FXCollections.observableArrayList();
@@ -176,7 +217,7 @@ public class OpenDataSetOverviewController {
 	int index = 0;
 	
 	private double aspectRatio = (double)0;
-	boolean isAspectSet = false;
+	boolean isAspectSet = false; 
 
 	public OpenDataSetOverviewController() {
 	}
@@ -190,9 +231,8 @@ public class OpenDataSetOverviewController {
 		System.gc();
 		splitPaneHor.setDividerPositions(0.15);
 		splitPaneHor.lookupAll(".split-pane-divider").stream().forEach(div -> div.setMouseTransparent(true));
-
-		nameColumn.setCellValueFactory(cellData -> cellData.getValue().klassProperty());
-		nameColumn.setCellFactory(TooltippedTableCell.forTableColumn());
+		
+		//nameColumn.setCellFactory(TooltippedTableCell.forTableColumn());
 		textColumn.setCellValueFactory(cellData -> cellData.getValue().additionalTextProperty());
 		textColumn.setCellFactory(TooltippedTableCell.forTableColumn());
 		xMinColumn.setCellValueFactory(cellData -> cellData.getValue().xMinProperty().asObject());
@@ -200,13 +240,46 @@ public class OpenDataSetOverviewController {
 		xMaxColumn.setCellValueFactory(cellData -> cellData.getValue().xMaxProperty().asObject());
 		yMaxColumn.setCellValueFactory(cellData -> cellData.getValue().yMaxProperty().asObject());
 
+		nameColumn.setCellFactory(column -> {
+		    return new TableCell<ResizableRectangleWrapper, String>() {
+		        @Override
+		        protected void updateItem(String item, boolean empty) {
+		            super.updateItem(item, empty);
+		            if(!empty | item != null) {
+		            	this.setText(item);
+		            	//this.textFillProperty().bind(mainApp.getColorOfClasses().get(item));
+		            	String color = mainApp.getColorOfClasses().get(item).get().toString();
+		            	color = color.substring(2);
+		            	color = "#" + color;
+		            	String style = "-fx-background-color: " + color;
+		            	this.setStyle(style);
+		            }
+		            else {
+		            	this.setText(null);
+		            	this.setStyle("");
+		            }
+		        }
+		    };
+		});
+		
+		nameColumn.setCellValueFactory(cellData -> cellData.getValue().klassProperty());
+		
 		// Add listener for which image need to be display in imageview
 		listOfImg.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
 				listOfImgWithAnnotations.getSelectionModel().select(-1);
 				listOfVerImg.getSelectionModel().select(-1);
+				showImage(newValue);
 			}
-			showImage(newValue);
+			else {
+				if(imgs.isEmpty()) {
+					listOfImgWithAnnotations.getSelectionModel().select(imgsWithAnnotations.size()-1);
+					listOfImgWithAnnotations.getFocusModel()
+					.focus(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
+			listOfImgWithAnnotations.scrollTo(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
+				}
+			}
+			
 		});
 		listOfImgWithAnnotations.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> {
@@ -225,7 +298,9 @@ public class OpenDataSetOverviewController {
 		});
 		// Add listener for which rectangle to select
 		annotationsTable.getSelectionModel().selectedItemProperty()
-				.addListener((observable, oldValue, newValue) -> showRectangle(newValue, oldValue));
+				.addListener((observable, oldValue, newValue) ->{ 
+					showRectangle(newValue, oldValue);
+				});
 		annotationsTable.setPlaceholder(new Label("No annotations"));
 		
 
@@ -243,6 +318,7 @@ public class OpenDataSetOverviewController {
 		Image imageBack = new Image(getClass().getResourceAsStream("/Actions-document-revert-icon.png"));
 		Image imageAnn = new Image(getClass().getResourceAsStream("/Actions-edit-select-all-icon.png"));
 		Image imageImages = new Image(getClass().getResourceAsStream("/Mimetypes-image-x-generic-icon.png"));
+		Image imageFitToScreenZoom = new Image(getClass().getResourceAsStream("/Actions-page-zoom-icon.png"));
 
 		tag.setGraphic(new ImageView(imageTag));
 		tag.setDisable(true);
@@ -256,12 +332,13 @@ public class OpenDataSetOverviewController {
 		zoomInButton.setGraphic(new ImageView(imageZoomIn));
 		zoomOutButton.setGraphic(new ImageView(imageZoomOut));
 		fitZoomButton.setGraphic(new ImageView(imageFitZoom));
-		saveButton.setGraphic(new ImageView(imageSave));
-		saveButton.setDisable(true);
+		fitToScreenButton.setGraphic(new ImageView(imageFitToScreenZoom));
+		//saveButton.setGraphic(new ImageView(imageSave));
+		//saveButton.setDisable(true);
 		backButton.setGraphic(new ImageView(imageBack));
 		//images.setGraphic(new ImageView(imageImages));
-		//ann.setGraphic(new ImageView(imageAnn));
-
+		//ann.setGraphic(new ImageView(imageAnn)); 
+		
 		/**
 		 * zoomProperty.addListener(new InvalidationListener() {
 		 * 
@@ -277,6 +354,8 @@ public class OpenDataSetOverviewController {
 		 *           1.1); } } });
 		 */
 
+		
+		
 		tag.setToggleGroup(toggleGroup);
 		// Add listener for toggle button
 		// If is pressed enable drawing a recatngle, if is not disable
@@ -288,6 +367,35 @@ public class OpenDataSetOverviewController {
 			}
 		}));
 
+//		borderPaneOfImg.widthProperty().addListener((observable, oldValue, newValue) -> {
+//			System.out.println(newValue);
+//			
+//		});
+		
+	}
+	
+	public DataSet getDataSet() {
+		return dataSet;
+	}
+	
+	public ResizableRectangleWrapper getSelectedAnnotation() {
+		return annotationsTable.getSelectionModel().getSelectedItem();
+	}
+	
+	public void refreshImage() {
+		if (listOfImg.getSelectionModel().getSelectedItem() != null) {
+			int index = listOfImg.getSelectionModel().getSelectedIndex();
+			listOfImg.getSelectionModel().select(-1);
+			listOfImg.getSelectionModel().select(index);
+		} else if (listOfImgWithAnnotations.getSelectionModel().getSelectedItem() != null) {
+			int index = listOfImgWithAnnotations.getSelectionModel().getSelectedIndex();
+			listOfImgWithAnnotations.getSelectionModel().select(-1);
+			listOfImgWithAnnotations.getSelectionModel().select(index);
+		} else {
+			int index = listOfVerImg.getSelectionModel().getSelectedIndex();
+			listOfVerImg.getSelectionModel().select(-1);
+			listOfVerImg.getSelectionModel().select(index);
+		}
 	}
 
 	public void setMainApp(MainApp mainApp) {
@@ -309,12 +417,16 @@ public class OpenDataSetOverviewController {
 				} else if (event.getCode() == KeyCode.DELETE) {
 					if (annotationsTable.getSelectionModel().getSelectedItem() != null
 							&& !deleteButton.disabledProperty().get()) {
-						System.out.println("delete button pressed");
 						handleDeleteButton();
 					}
 				}
 			}
 		});
+		
+		legendOverlap.textFillProperty().bind(mainApp.getColorsOfFlags().get("Overlap"));
+		legendTruncated.textFillProperty().bind(mainApp.getColorsOfFlags().get("Truncated"));
+		legendDifficult.textFillProperty().bind(mainApp.getColorsOfFlags().get("Difficult"));
+		legendOverlapTruncated.textFillProperty().bind(mainApp.getColorsOfFlags().get("Overlap&Truncated"));
 	}
 
 	/**
@@ -326,6 +438,7 @@ public class OpenDataSetOverviewController {
 	 */
 	public void setDataSet(DataSet dataSet) {
 		this.dataSet = dataSet;
+		updateAnnotationsNumber();
 		BigList<DataImage> images = BigList.create(dataSet.getDataSetImages());
 		Iterator<DataImage> itr = images.iterator();
 		while (itr.hasNext()) {
@@ -626,18 +739,18 @@ public class OpenDataSetOverviewController {
 	 */
 	private void showImage(String imageName) {
 		if (imageName == null) {
-			clearSelection(imageGroup);
+			//clearSelection(imageGroup);
 			imageView.setImage(null);
 			return;
 		}
-		handleFitZoomButton();
+		//handleFitZoomButton();
 		String path = dataSet.getDataSetImagesLocation() + "\\" + imageName;
 		clearSelection(imageGroup);
 		editButton.setDisable(true);
 		deleteButton.setDisable(true);
 		annotations.clear();
 		tag.setDisable(false);
-		saveButton.setDisable(false);
+		//saveButton.setDisable(false);
 		try {
 			if (imageGroup != null) {
 				imageGroup.getChildren().remove(imageView);
@@ -650,26 +763,22 @@ public class OpenDataSetOverviewController {
 			imageView.fitWidthProperty().bind(image.widthProperty());
 			imageView.fitHeightProperty().bind(image.heightProperty());
 			imageView.setPreserveRatio(true);
-			// imageView.preserveRatioProperty().set(true);
-			/**
-			 * System.out.println(imageView.getFitWidth() + " " + imageView.getFitHeight() +
-			 * " " + imageView.preserveRatioProperty()); System.out.println(image.getWidth()
-			 * + " " + image.getHeight());; System.out.println(borderPaneOfImg.getWidth() +
-			 * borderPaneOfImg.getHeight()); System.out.println(anchorPaneOfImg.getWidth());
-			 */
 			imageView.setPickOnBounds(true);
-//			if(imageView.getFitWidth() > borderPaneOfImg.getWidth()) {
-//				imageView.fitWidthProperty().bind(borderPaneOfImg.widthProperty());
-//				//imageView.fitHeightProperty().bind(borderPaneOfImg.heightProperty());
-//			}
 			imageGroup.getChildren().add(0, imageView);
 			Parent zoomPane = createZoomPane(imageGroup);
+			scroller.prefWidthProperty().bind(borderPaneOfImg.widthProperty());
+			scroller.prefHeightProperty().bind(borderPaneOfImg.heightProperty());
+			scroller.setHvalue(scroller.getHmin() + (scroller.getHmax() - scroller.getHmin()) / 2);
+			scroller.setVvalue(scroller.getVmin() + (scroller.getVmax() - scroller.getVmin()) / 2);
 			borderPaneOfImg.setCenter(zoomPane);
 			//imageHolder.getChildren().add(imageGroup);
 			//scrollPaneOfImg.setContent(imageHolder);
 			
 			//imageView.fitWidthProperty().bind(borderPaneOfImg.widthProperty());
 			showAnnotations(imageName);
+			if(!lockZoomLevel.isSelected()) {
+				handleFitZoomToScreenButton();
+			}		
 			stream.close();
 			System.gc();
 
@@ -680,38 +789,94 @@ public class OpenDataSetOverviewController {
 
 	private Parent createZoomPane(final Group group) {
 		final StackPane zoomPane = new StackPane();
-
+		
 		zoomPane.getChildren().add(group);
-
-		ScrollPane scroller = new ScrollPane();
-		final Group scrollContent = new Group(zoomPane);
-		scroller.setContent(scrollContent);
-
-		scroller.viewportBoundsProperty().addListener(new ChangeListener<Bounds>() {
-			@Override
-			public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-				zoomPane.setMinSize(newValue.getWidth(), newValue.getHeight());
+		zoomPane.addEventHandler(MouseEvent.ANY, event -> {
+		    if(event.getButton() != MouseButton.MIDDLE) event.consume();
+		});
+		
+		zoomPane.setOnScroll(event -> {
+			if(event.isControlDown()) {
+				event.consume();
+				double factor = event.getDeltaY();
 				
+				if(factor > 0) {
+					handleZoomInButton();
+				}
+				else if (factor < 0) {
+					handleZoomOutButton();
+				}
 			}
 		});
 
+		final Group scrollContent = new Group(zoomPane);
+		
+		scroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		
+		scroller.setPannable(true);
+		scroller.setContent(scrollContent);
+
+		//System.out.println("MinWidthProperty before: " + zoomPane.minWidthProperty().get());
+		zoomPane.minWidthProperty().bind(Bindings.createDoubleBinding(() -> scroller.getViewportBounds().getWidth(), scroller.viewportBoundsProperty()));
+
+		zoomPane.minHeightProperty().bind(Bindings.createDoubleBinding(() -> scroller.getViewportBounds().getHeight(), scroller.viewportBoundsProperty()));
+		//System.out.println("MinWidthProperty after: " + zoomPane.minWidthProperty().get());
+//		scroller.viewportBoundsProperty().addListener(new ChangeListener<Bounds>() {
+//			@Override
+//			public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//				System.out.println("******************************");
+//				System.out.println(oldValue.getWidth());
+//				System.out.println(oldValue.getHeight());
+//				zoomPane.setMinSize(newValue.getWidth(), newValue.getHeight());
+//				System.out.println(newValue.getWidth());
+//				System.out.println(newValue.getHeight());
+//				System.out.println("******************************");
+//			}
+//		});
+
 		return scroller;
 	}
+	
+	
 
 	private void showRectangle(ResizableRectangleWrapper rectangleWrapperNew,
 			ResizableRectangleWrapper rectangleWrapperOld) {
 		if (rectangleWrapperNew != null) {
-			rectangleWrapperNew.getRectangle().setFill(Color.LIGHTPINK.deriveColor(0, 1.2, 1, 0.5));
+			rectangleWrapperNew.getRectangle().setFill(Color.WHITE.deriveColor(0, 1.2, 1, 0.2));
 		}
 		if (rectangleWrapperOld != null) {
-			rectangleWrapperOld.getRectangle().setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.5));
+			rectangleWrapperOld.getRectangle()
+					.setFill(mainApp.getColorOfClasses().get(rectangleWrapperOld.getKlass()).get());
+
 		}
 		editButton.setDisable(false);
 		deleteButton.setDisable(false);
+		if (editModeCheckBox.isSelected()) {
+			if (rectangleWrapperNew != null) {
+				int index = rectangleWrapperNew.getIndex();
+				int start = index + (index - 1) * 9;
+				int end = start + 10;
+				for (int i = 1; i < imageGroup.getChildren().size(); i++) {
+					if (i >= start && i < end) {
+						imageGroup.getChildren().get(i).setVisible(true);
+					} else {
+						imageGroup.getChildren().get(i).setVisible(false);
+					}
+				}
+				handleEditButton();
+			}
+		}
+		else {
+			for(javafx.scene.Node node: imageGroup.getChildren()) {
+				node.setVisible(true);
+			}
+		}
 	}
 
 	private void showAnnotations(String imageName) {
 		String name;
+		String color = "";
 		String text = "";
 		String truncated = "0";
 		String difficult = "0";
@@ -750,6 +915,10 @@ public class OpenDataSetOverviewController {
 						if (temp.getLength() > 0) {
 							text = eElement.getElementsByTagName("text").item(0).getTextContent().trim();
 						}
+						temp = eElement.getElementsByTagName("color");
+						if (temp.getLength() > 0) {
+							color = eElement.getElementsByTagName("color").item(0).getTextContent().trim();
+						}
 						temp = eElement.getElementsByTagName("truncated");
 						if (temp.getLength() > 0) {
 							truncated = eElement.getElementsByTagName("truncated").item(0).getTextContent().trim();
@@ -782,6 +951,7 @@ public class OpenDataSetOverviewController {
 								imageGroup, annotations, annotationsTable, imageView, mainApp);
 						rectWrap = new ResizableRectangleWrapper(rect, index);
 						rectWrap.setKlass(name);
+						rectWrap.setColor(color);
 						rectWrap.setAdditionalText(text);
 						if (truncated.equals("0")) {
 							rectWrap.setTruncated(false);
@@ -803,6 +973,25 @@ public class OpenDataSetOverviewController {
 							annotationsTable.setItems(annotations);
 						} else {
 							annotations.add(rectWrap);
+						}
+						rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+						boolean overlapFlag = rectWrap.getOverlap();
+						boolean truncatedFlag = rectWrap.getTruncated();
+						boolean difficultFlag = rectWrap.getDifficult();
+						if(overlapFlag && truncatedFlag) {
+							rectWrap.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap&Truncated").get());
+						}
+						else if(overlapFlag) {
+							rectWrap.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap").get());
+						}
+						else if(truncatedFlag) {
+							rectWrap.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Truncated").get());
+						}
+						else if(difficultFlag) {
+							rectWrap.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Difficult").get());
+						}
+						else if(overlapFlag == false && truncatedFlag == false && difficultFlag == false) {
+							rectWrap.getRectangle().setStroke(mainApp.getDefaultBorderColor());
 						}
 
 					}
@@ -828,8 +1017,8 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private void handleDeleteButton() {
 
+		updateAnnotations("Minus");
 		int i = annotationsTable.getSelectionModel().getSelectedItem().getIndex();
-		System.out.println(i);
 		int j = i + (i - 1) * 9;
 		imageGroup.getChildren().remove(j, j + 10);
 		annotations.remove(annotationsTable.getSelectionModel().getSelectedItem());
@@ -843,14 +1032,73 @@ public class OpenDataSetOverviewController {
 		}
 
 		index = index - 1;
+		
+		updateAnnotationsNumber();
+		
+		handleSaveButton();
 	}
 
 	@FXML
 	private void handleEditButton() {
 		ResizableRectangleWrapper rect = annotationsTable.getSelectionModel().getSelectedItem();
 
+		updateAnnotations("Minus");
 		mainApp.showEditAnnotationDialog(rect, rect.getIndex(), annotations);
+		
+		boolean overlap = rect.getOverlap();
+		boolean truncated = rect.getTruncated();
+		boolean difficult = rect.getDifficult();
+		if(overlap) {
+			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap").get());
+		}
+		else if(truncated) {
+			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Truncated").get());
+		}
+		else if(difficult) {
+			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Difficult").get());
+		}
+		else if(overlap == false && truncated == false && difficult == false) {
+			rect.getRectangle().setStroke(mainApp.getDefaultBorderColor());
+		}
+		
+		updateAnnotations("Plus");
+		
+		handleSaveButton();
 
+	}
+	
+	public void updateAnnotations(String name) {
+		ResizableRectangleWrapper rect = annotationsTable.getSelectionModel().getSelectedItem();
+		if (name.equals("Minus")) {
+			if(dataSet.getAnnotations().containsKey(rect.getKlass())) {
+				int num = dataSet.getAnnotations().get(rect.getKlass());
+				num = num - 1;
+				if(num == 0) {
+					dataSet.getAnnotations().remove(rect.getKlass());
+				}
+				else {
+					dataSet.getAnnotations().put(rect.getKlass(), num);
+				}
+			}
+		}
+		else if(name.equals("Plus")) {
+			if(dataSet.getAnnotations().containsKey(rect.getKlass())) {
+				int num = dataSet.getAnnotations().get(rect.getKlass());
+				num = num + 1;
+				dataSet.getAnnotations().put(rect.getKlass(), num);
+			}
+			else {
+				dataSet.getAnnotations().put(rect.getKlass(), 1);
+			}
+		}
+	}
+	
+	public void updateAnnotationsNumber() {
+		numberOfAnnotationsInSet = 0;
+		dataSet.getAnnotations().forEach((k,v) -> {
+			numberOfAnnotationsInSet = numberOfAnnotationsInSet + v;
+		});
+		numberOfAnnotationsInSetLabel.setText("Total annotations in set: " + numberOfAnnotationsInSet.toString());
 	}
 
 	@FXML
@@ -869,6 +1117,28 @@ public class OpenDataSetOverviewController {
 	private void handleFitZoomButton() {
 		imageGroup.setScaleX(1);
 		imageGroup.setScaleY(1);
+	}
+	
+	@FXML
+	private void handleFitZoomToScreenButton() {
+		double num = borderPaneOfImg.getWidth()/imageView.getFitWidth();
+		if(num < 2) {
+			//num = num - 0.02;
+		}
+		else {
+			//num = num - 0.04;
+		}
+		imageGroup.setScaleX(num);
+		imageGroup.setScaleY(num);
+		if(imageView.getFitHeight()*imageGroup.getScaleY() > borderPaneOfImg.getHeight()) {
+			num = borderPaneOfImg.getHeight()/imageView.getFitHeight();
+			//num = num - 0.02;
+			imageGroup.setScaleX(num);
+			imageGroup.setScaleY(num);
+		}
+		scroller.setHvalue(scroller.getHmin() + (scroller.getHmax() - scroller.getHmin()) / 2);
+		scroller.setVvalue(scroller.getVmin() + (scroller.getVmax() - scroller.getVmin()) / 2);
+		//scroller.layout();
 	}
 
 	@FXML
@@ -944,7 +1214,7 @@ public class OpenDataSetOverviewController {
 	}
 	
 	@FXML
-	private void handleSaveButton() {
+	public void handleSaveButton() {
 
 		try {
 			boolean isVerified = false;
@@ -953,11 +1223,13 @@ public class OpenDataSetOverviewController {
 			Document doc = dBuilder.newDocument();
 
 			String imageName;
+			int index;
 			Element filename = doc.createElement("filename");
 			if (listOfImg.getSelectionModel().getSelectedItem() != null) {
 				imageName = listOfImg.getSelectionModel().getSelectedItem();
 			} else if (listOfImgWithAnnotations.getSelectionModel().getSelectedItem() != null) {
 				imageName = listOfImgWithAnnotations.getSelectionModel().getSelectedItem();
+				index = listOfImgWithAnnotations.getSelectionModel().getSelectedIndex();
 			} else {
 				imageName = listOfVerImg.getSelectionModel().getSelectedItem();
 				isVerified = true;
@@ -1009,6 +1281,8 @@ public class OpenDataSetOverviewController {
 				Element object = doc.createElement("object");
 				Element name = doc.createElement("name");
 				name.appendChild(doc.createTextNode(rectWrapp.getKlass()));
+				Element color = doc.createElement("color");
+				color.appendChild(doc.createTextNode(rectWrapp.getColor()));
 				Element text = doc.createElement("text");
 				text.appendChild(doc.createTextNode(rectWrapp.getAdditionalText()));
 				Element pose = doc.createElement("pose");
@@ -1038,6 +1312,7 @@ public class OpenDataSetOverviewController {
 				aspect_ratio.appendChild(doc.createTextNode(String.valueOf(rectWrapp.getAspectRatio())));
 				
 				object.appendChild(name);
+				object.appendChild(color);
 				object.appendChild(text);
 				object.appendChild(pose);
 				object.appendChild(truncated);
@@ -1088,13 +1363,31 @@ public class OpenDataSetOverviewController {
 					verImgs.remove(imageName);
 					dataSet.removeDataSetVerifiedImage(imageName);
 				}
+				imgs.remove(imageName);
+				dataSet.removeDataSetImage(imageName);
 			}
-			imgs.remove(imageName);
-			dataSet.removeDataSetImage(imageName);
+			else {
+				if(annotations.size() == 0 | annotations.isEmpty()) {
+					imgs.add(imageName);
+					DataImage img = new DataImage(imageName);
+					dataSet.addDataSetImage(img);
+					dataSet.removeDataSetImageWithAnnotations(imageName);
+					imgsWithAnnotations.remove(imageName);
+				}
+			}
 			
 			File file = MainApp.getLastFilePath();
 			mainApp.saveDataSetsToFile(file);
 
+			if(listOfImg.getSelectionModel().getSelectedItem() != null || imgs.size()==0) {
+				if(listOfImg.getSelectionModel().getSelectedIndex() == 0) {
+					listOfImgWithAnnotations.getSelectionModel().select(imgsWithAnnotations.size()-1);
+					listOfImgWithAnnotations.getFocusModel()
+					.focus(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
+			listOfImgWithAnnotations.scrollTo(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
+				}
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1111,6 +1404,12 @@ public class OpenDataSetOverviewController {
 			listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
 			listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
 		} else if (listOfImgWithAnnotations.getSelectionModel().getSelectedItem() != null) {
+			if(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex() == (imgsWithAnnotations.size()-1)) {
+				listOfImg.getSelectionModel().select(0);
+				listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
+				listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
+				return;
+			}
 			listOfImgWithAnnotations.getSelectionModel().selectNext();
 			listOfImgWithAnnotations.getFocusModel()
 					.focus(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
@@ -1129,6 +1428,13 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private void handlePrevious() {
 		if (listOfImg.getSelectionModel().getSelectedItem() != null) {
+			if(listOfImg.getSelectionModel().getSelectedIndex() == 0) {
+				listOfImgWithAnnotations.getSelectionModel().select(imgsWithAnnotations.size()-1);
+				listOfImgWithAnnotations.getFocusModel()
+				.focus(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
+		listOfImgWithAnnotations.scrollTo(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
+				return;
+			}
 			listOfImg.getSelectionModel().selectPrevious();
 			listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
 			listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
@@ -1220,9 +1526,12 @@ public class OpenDataSetOverviewController {
 	}
 
 	public void clearSelection(Group group) {
-		// deletes everything except for base container layer
-		group.getChildren().remove(1, group.getChildren().size());
-		index = 0;
+		if (group.getChildren().size() > 1) {
+			// deletes everything except for base container layer
+			System.out.println(group.getChildren().size());
+			group.getChildren().remove(1, group.getChildren().size());
+			index = 0;
+		}
 
 	}
 
@@ -1252,13 +1561,23 @@ public class OpenDataSetOverviewController {
 		}
 
 		EventHandler<MouseEvent> onMousePressedEventHandler = event -> {
+			if(event.isMiddleButtonDown()) {
+				System.out.println("srednji stisnut");
+				return;
+			}
 			if (event.isSecondaryButtonDown()) {
 				System.out.println("desni");
 				isSecondary = true;
+				for(javafx.scene.Node node: imageGroup.getChildren()) {
+					node.setVisible(true);
+				}
 				return;
 			}
 			for (ResizableRectangleWrapper rectWrap : annotations) {
-				rectWrap.getRectangle().setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.5));
+				rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+			}
+			for(javafx.scene.Node node: imageGroup.getChildren()) {
+				node.setVisible(true);
 			}
 			annotationsTable.getSelectionModel().clearSelection();
 			isSecondary = false;
@@ -1290,8 +1609,10 @@ public class OpenDataSetOverviewController {
 		};
 
 		EventHandler<MouseEvent> onMouseDraggedEventHandler = event -> {
-			if (event.isSecondaryButtonDown())
+			if(event.isMiddleButtonDown()) return;
+			if (event.isSecondaryButtonDown()) {
 				return;
+			}
 			if (aspectRatioLock.isSelected()) {
 				if((xField.getText().length() == 0 || xField.getText() == null) && (yField.getText().length() == 0 || yField.getText() == null)) {
 					aspectRatio = (double) 1/1;
@@ -1376,6 +1697,10 @@ public class OpenDataSetOverviewController {
 		};
 
 		EventHandler<MouseEvent> onMouseReleasedEventHandler = event -> {
+			if(event.getButton() != MouseButton.PRIMARY) {
+				System.out.println("srednji otpušten");
+				return;
+			}
 			if (selectionRectangle != null && !isSecondary) {
 
 				String selectedImage;
@@ -1398,6 +1723,39 @@ public class OpenDataSetOverviewController {
 						} else {
 							annotations.add(annotation);
 						}
+						annotation.getRectangle().setFill(mainApp.getColorOfClasses().get(annotation.getKlass()).get());
+						boolean overlap = annotation.getOverlap();
+						boolean truncated = annotation.getTruncated();
+						boolean difficult = annotation.getDifficult();
+						if(overlap && truncated) {
+							annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap&Truncated").get());
+						}
+						else if(overlap) {
+							annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap").get());
+						}
+						else if(truncated) {
+							annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Truncated").get());
+						}
+						else if(difficult) {
+							annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Difficult").get());
+						}
+						else if(overlap == false && truncated == false && difficult == false) {
+							annotation.getRectangle().setStroke(mainApp.getDefaultBorderColor());
+						}
+						
+						if(dataSet.getAnnotations().containsKey(annotation.getKlass())) {
+							int num = dataSet.getAnnotations().get(annotation.getKlass());
+							num = num + 1;
+							dataSet.getAnnotations().put(annotation.getKlass(), num);
+						}
+						else {
+							dataSet.getAnnotations().put(annotation.getKlass(), 1);
+						}
+						
+						updateAnnotationsNumber();
+						
+						handleSaveButton();
+						
 					} else {
 						index = index - 1;
 					}
@@ -1409,18 +1767,6 @@ public class OpenDataSetOverviewController {
 
 	
 	private void testPrint() {
-		//System.out.println(scroller.computeAreaInScreen());
-		if(imageView.getFitWidth() > borderPaneOfImg.getWidth()) {
-			System.out.println("vece");
-			System.out.println(borderPaneOfImg.getWidth()/imageView.getFitWidth()-0.02);
-			imageGroup.setScaleX(borderPaneOfImg.getWidth()/imageView.getFitWidth()-0.02);
-			imageGroup.setScaleY(borderPaneOfImg.getWidth()/imageView.getFitWidth()-0.02);
-			
-			
-		}
-		System.out.println(imageView.fitWidthProperty());
-		System.out.println(imageView.fitHeightProperty());
-		System.out.println(image.widthProperty());
-		System.out.println(image.heightProperty());
+		
 	}
 }

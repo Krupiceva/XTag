@@ -17,6 +17,7 @@ import javax.xml.bind.Unmarshaller;
 
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.DataSetListWrapper;
+import fer.hr.telegra.model.PathData;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
 import fer.hr.telegra.view.AnnotateDialogController;
@@ -53,11 +54,18 @@ public class MainApp extends Application {
 	private BorderPane rootLayout;
 	private final String appVersion = "XTag v2.0.0 ";
 	
+	PathData pathData = PathData.getInstance();
+	
 	//Lists of datasets
 	private ObservableList<DataSet> dataSets = FXCollections.observableArrayList();
 	
 	//List of annotations 
 	private ObservableList<String> annotations = FXCollections.observableArrayList();
+	
+	//List of collors 
+	HashMap<String, ObjectProperty<Color>> collors = new HashMap<String, ObjectProperty<Color>>();
+	
+	private ObservableList<String> colors = FXCollections.observableArrayList();
 	
 	//Map of colors of annotations
 	HashMap<String, ObjectProperty<Color>> colorsOfClasses = new HashMap<String, ObjectProperty<Color>>();
@@ -81,6 +89,14 @@ public class MainApp extends Application {
 	
 	public ObservableList<String> getAnnotations(){
 		return annotations;
+	}
+	
+	public ObservableList<String> getColors(){
+		return colors;
+	}
+	
+	public HashMap<String, ObjectProperty<Color>> getCollors(){
+		return collors;
 	}
 
 	public HashMap<String, ObjectProperty<Color>> getColorOfClasses(){
@@ -350,7 +366,8 @@ public class MainApp extends Application {
 	        controller.setIndex(index);
 	        controller.setAnnotation(annotations);
 	        
-	        
+	        //dialogStage.setX(rectangle.getXMax());
+	        //dialogStage.setY(rectangle.getYMax());
 	        
 	        dialogStage.showAndWait();
 	        return controller.isOkClicked();
@@ -471,7 +488,23 @@ public class MainApp extends Application {
 		        colorsOfFlags.put(temp[0], new SimpleObjectProperty<Color>(Color.web(temp[1])) );
 		    }
 			reader.close();
+			
+			file = new File("config/collors.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while ((line = reader.readLine()) != null) {
+				colors.add(line);
+		    }
+			reader.close();
 				
+			file = new File("config/path_data.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while((line = reader.readLine()) != null) {
+				pathData.path = line;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

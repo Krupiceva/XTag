@@ -1,12 +1,14 @@
 package fer.hr.telegra.model;
 
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import fer.hr.telegra.MainApp;
 import javafx.collections.ObservableList;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -18,20 +20,23 @@ public class ResizableRectangle extends Rectangle {
     private double mouseClickPozX;
     private double mouseClickPozY;
     private double aspectRatio;
-    private static final double RESIZER_SQUARE_SIDE = 8;
+    private static final double RESIZER_SQUARE_SIDE = 4;
     private Paint resizerSquareColor = Color.WHITE;
-    private Paint rectangleStrokeColor = Color.BLUE;
+    private Paint rectangleStrokeColor = Color.WHITE;
     private ImageView imageView;
+    private MainApp mainApp;
 
     public ResizableRectangle(double x, double y, double width, double height, double aspectRatio, Group group, ObservableList<ResizableRectangleWrapper> annotations, TableView<ResizableRectangleWrapper> annotationsTable, ImageView imageView, MainApp mainApp) {
     	super(x,y,width,height);
     	//super.widthProperty().bindBidirectional(super.heightProperty());
         this.imageView = imageView;
         this.aspectRatio = aspectRatio;
+        this.mainApp = mainApp;
         group.getChildren().add(this);
-        super.setStroke(rectangleStrokeColor);
+        super.setStroke(mainApp.getDefaultBorderColor());
         super.setStrokeWidth(1);
-        super.setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.5));
+        super.setStrokeType(StrokeType.INSIDE);
+        super.setFill(mainApp.getDefaultColor());
 
 
         Rectangle moveRect = new Rectangle(0,0,0,0);
@@ -49,6 +54,9 @@ public class ResizableRectangle extends Rectangle {
         });
 
         moveRect.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+        	if(event.getButton() != MouseButton.PRIMARY) {
+        		return;
+        	}
             moveRect.getParent().setCursor(Cursor.MOVE);
             mouseClickPozX = event.getX();
             mouseClickPozY = event.getY();
@@ -60,9 +68,9 @@ public class ResizableRectangle extends Rectangle {
     			int ymax = rectWrap.getYMax();
     			int curx = (int) event.getX();
     			int cury = (int) event.getY();
-    			rectWrap.getRectangle().setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.5));
+    			rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
     			if(curx > xmin && curx < xmax && cury > ymin && cury < ymax) {
-    				rectWrap.getRectangle().setFill(Color.LIGHTPINK.deriveColor(0, 1.2, 1, 0.5));
+    				rectWrap.getRectangle().setFill(Color.WHITE.deriveColor(0, 1.2, 1, 0.2));;
     				annotationsTable.getSelectionModel().select(rectWrap);
     				/**
     				editButton.setDisable(false);
@@ -73,21 +81,68 @@ public class ResizableRectangle extends Rectangle {
     		}
             if(event.getClickCount() == 2) {
             	ResizableRectangleWrapper rect = annotationsTable.getSelectionModel().getSelectedItem();
+            	
+            	if(mainApp.openController.getDataSet().getAnnotations().containsKey(rect.getKlass())) {
+    				int num = mainApp.openController.getDataSet().getAnnotations().get(rect.getKlass());
+    				num = num - 1;
+    				if(num == 0) {
+    					mainApp.openController.getDataSet().getAnnotations().remove(rect.getKlass());
+    				}
+    				else {
+    					mainApp.openController.getDataSet().getAnnotations().put(rect.getKlass(), num);
+    				}
+    			}
+            	
             	mainApp.showEditAnnotationDialog(rect, rect.getIndex(), annotations);
+            	
+            	
+        		boolean overlap = rect.getOverlap();
+        		boolean truncated = rect.getTruncated();
+        		boolean difficult = rect.getDifficult();
+        		if(overlap && truncated) {
+        			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap&Truncated").get());
+        		}
+        		else if(overlap) {
+        			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap").get());
+        		}
+        		else if(truncated) {
+        			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Truncated").get());
+        		}
+        		else if(difficult) {
+        			rect.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Difficult").get());
+        		}
+        		else if(overlap == false && truncated == false && difficult == false) {
+        			rect.getRectangle().setStroke(mainApp.getDefaultBorderColor());
+        		}
+        		
+        		if(mainApp.openController.getDataSet().getAnnotations().containsKey(rect.getKlass())) {
+    				int num = mainApp.openController.getDataSet().getAnnotations().get(rect.getKlass());
+    				num = num + 1;
+    				mainApp.openController.getDataSet().getAnnotations().put(rect.getKlass(), num);
+    			}
+    			else {
+    				mainApp.openController.getDataSet().getAnnotations().put(rect.getKlass(), 1);
+    			}
+        		
+        		mainApp.openController.handleSaveButton();
             }
             //System.out.println(event.getPickResult());
 
         });
 
-        moveRect.addEventHandler(MouseEvent.MOUSE_RELEASED, event ->
-                moveRect.getParent().setCursor(Cursor.HAND));
-
+        moveRect.addEventHandler(MouseEvent.MOUSE_RELEASED, event ->{
+                moveRect.getParent().setCursor(Cursor.HAND);
+                mainApp.openController.handleSaveButton();
+        });
         moveRect.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
                 moveRect.getParent().setCursor(Cursor.DEFAULT);
                 //super.setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.6));
         });
 
         moveRect.addEventHandler(MouseEvent.MOUSE_DRAGGED,event -> {
+        	if(event.getButton() != MouseButton.PRIMARY) {
+        		return;
+        	}
 
             double offsetX = event.getX() - mouseClickPozX;
             double offsetY = event.getY() - mouseClickPozY;
@@ -102,7 +157,7 @@ public class ResizableRectangle extends Rectangle {
             }
             mouseClickPozX = event.getX();
             mouseClickPozY = event.getY();
-
+            
         });
 
 
@@ -436,8 +491,10 @@ public class ResizableRectangle extends Rectangle {
     private void prepareResizerSquare(Rectangle rect) {
         rect.setFill(resizerSquareColor);
 
-        rect.addEventHandler(MouseEvent.MOUSE_EXITED, event ->
-                rect.getParent().setCursor(Cursor.DEFAULT));
+        rect.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+                rect.getParent().setCursor(Cursor.DEFAULT);
+                mainApp.openController.handleSaveButton();
+        });
     }
 
     public double getAspectRatio() {

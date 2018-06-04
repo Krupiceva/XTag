@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dataSets>
     <dataSet>
+        <annotations>
+            <entry>
+                <key>car</key>
+                <value>1</value>
+            </entry>
+            <entry>
+                <key>truck</key>
+                <value>1</value>
+            </entry>
+        </annotations>
         <cameraAngle>0.0</cameraAngle>
         <cameraHigh>0.0</cameraHigh>
         <dataSetAnnotationsLocation>sample/annotations</dataSetAnnotationsLocation>
-        <dataSetImages>
-            <imageName>truck.jpg</imageName>
-        </dataSetImages>
         <dataSetImagesLocation>sample/images</dataSetImagesLocation>
         <dataSetImagesWithAnnotations>
             <imageName>car.jpg</imageName>
+        </dataSetImagesWithAnnotations>
+        <dataSetImagesWithAnnotations>
+            <imageName>truck.jpg</imageName>
         </dataSetImagesWithAnnotations>
         <dataSetName>Test set</dataSetName>
         <imageQuality>Unknown</imageQuality>

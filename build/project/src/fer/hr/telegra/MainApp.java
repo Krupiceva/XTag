@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import javax.xml.bind.JAXBContext;
@@ -18,6 +20,7 @@ import fer.hr.telegra.model.DataSetListWrapper;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
 import fer.hr.telegra.view.AnnotateDialogController;
+import fer.hr.telegra.view.ConfigAnnotationsController;
 import fer.hr.telegra.view.DataSetAddDialogController;
 import fer.hr.telegra.view.DataSetEditDialogController;
 import fer.hr.telegra.view.DataSetsOverviewController;
@@ -26,6 +29,10 @@ import fer.hr.telegra.view.ExportFramesDialogController;
 import fer.hr.telegra.view.OpenDataSetOverviewController;
 import fer.hr.telegra.view.RootLayoutController;
 import javafx.application.Application;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -36,6 +43,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -43,7 +51,7 @@ public class MainApp extends Application {
 	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
-	private final String appVersion = "XTag v1.3 ";
+	private final String appVersion = "XTag v2.0.0 ";
 	
 	//Lists of datasets
 	private ObservableList<DataSet> dataSets = FXCollections.observableArrayList();
@@ -51,8 +59,25 @@ public class MainApp extends Application {
 	//List of annotations 
 	private ObservableList<String> annotations = FXCollections.observableArrayList();
 	
+	//List of collors 
+	HashMap<String, ObjectProperty<Color>> collors = new HashMap<String, ObjectProperty<Color>>();
+	
+	private ObservableList<String> colors = FXCollections.observableArrayList();
+	
+	//Map of colors of annotations
+	HashMap<String, ObjectProperty<Color>> colorsOfClasses = new HashMap<String, ObjectProperty<Color>>();
+	HashMap<String, ObjectProperty<Color>> colorsOfFlags = new HashMap<String, ObjectProperty<Color>>();
+	public StringProperty defaultClass = new SimpleStringProperty("unknown");
+	public Color defaultColor = Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.2);
+	public Color defaultBorderColor = Color.WHITE;
+	
+	public OpenDataSetOverviewController openController;
 	
 	public MainApp() { 
+		colorsOfFlags.put("Overlap", new SimpleObjectProperty<Color>(Color.RED));
+		colorsOfFlags.put("Truncated", new SimpleObjectProperty<Color>(Color.RED));
+		colorsOfFlags.put("Difficult", new SimpleObjectProperty<Color>(Color.RED));
+		colorsOfFlags.put("Overlap&Truncated", new SimpleObjectProperty<Color>(Color.RED));
 	}
 	
 	public ObservableList<DataSet> getDataSets() {
@@ -62,7 +87,50 @@ public class MainApp extends Application {
 	public ObservableList<String> getAnnotations(){
 		return annotations;
 	}
+	
+	public ObservableList<String> getColors(){
+		return colors;
+	}
+	
+	public HashMap<String, ObjectProperty<Color>> getCollors(){
+		return collors;
+	}
 
+	public HashMap<String, ObjectProperty<Color>> getColorOfClasses(){
+		return colorsOfClasses;
+	}
+	
+	public void setDefaultClass(String name) {
+		defaultClass.set(name);
+	}
+	
+	public String getDefaultClass() {
+		return defaultClass.get();
+	}
+	
+	public StringProperty defaultClassProperty() {
+		return defaultClass;
+	}
+	
+	public void setDefaultColor(Color color) {
+		defaultColor = color;
+	}
+	
+	public Color getDefaultColor() {
+		return defaultColor;
+	}
+	
+	public HashMap<String, ObjectProperty<Color>> getColorsOfFlags(){
+		return colorsOfFlags;
+	}
+	
+	public Color getDefaultBorderColor() {
+		return defaultBorderColor;
+	}
+	
+	public void setDefaultBorderColor(Color color) {
+		defaultBorderColor = color;
+	}
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -76,6 +144,7 @@ public class MainApp extends Application {
 		initAnnotations();
 		initRootLayout();
 		showDataSetsOverview();
+		
 	}
 	
 	/**
@@ -154,9 +223,9 @@ public class MainApp extends Application {
 			rootLayout.setCenter(openDataSetOverview);
 			
 			//Give the controller acces to the main app
-			OpenDataSetOverviewController controller = loader.getController();
-			controller.setMainApp(this);
-			controller.setDataSet(dataSet);
+			openController = loader.getController();
+			openController.setMainApp(this);
+			openController.setDataSet(dataSet);
 			
 			this.primaryStage.setTitle(appVersion + dataSet.getDataSetName());
 			
@@ -294,7 +363,8 @@ public class MainApp extends Application {
 	        controller.setIndex(index);
 	        controller.setAnnotation(annotations);
 	        
-	        
+	        //dialogStage.setX(rectangle.getXMax());
+	        //dialogStage.setY(rectangle.getYMax());
 	        
 	        dialogStage.showAndWait();
 	        return controller.isOkClicked();
@@ -333,6 +403,32 @@ public class MainApp extends Application {
 		}
 	}
 	
+	public void showConfigAnnotations () {
+		try {
+			
+			// Load the fxml file and create a new stage for the popup.
+	        FXMLLoader loader = new FXMLLoader();
+	        loader.setLocation(MainApp.class.getResource("view/ConfigAnnotations.fxml"));
+	        AnchorPane page = (AnchorPane) loader.load();
+	        Stage dialogStage = new Stage();
+	        dialogStage.setTitle("Annotations Configuration");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        dialogStage.initOwner(primaryStage);
+	        Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
+	        dialogStage.getIcons().add(appIcon);
+	        Scene scene = new Scene(page);
+	        dialogStage.setScene(scene);
+	        
+	        ConfigAnnotationsController controller = loader.getController();
+	        controller.setMainApp(this);
+	        controller.setDialogStage(dialogStage);
+	        
+	        dialogStage.showAndWait();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Method which read annotations from config file and add it to list of available annotations
@@ -347,6 +443,58 @@ public class MainApp extends Application {
 		        annotations.add(line);
 		    }
 			reader.close();
+//			for (String annotation: annotations) {
+//				colorsOfClasses.put(annotation, Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.2));
+//			}
+			
+			file = new File("config/annotations_colors.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while ((line = reader.readLine()) != null) {
+				String[] temp = line.split(" : ");
+		        colorsOfClasses.put(temp[0], new SimpleObjectProperty<Color>(Color.web(temp[1])) );
+		    }
+			reader.close();
+			
+			file = new File("config/default.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while ((line = reader.readLine()) != null) {
+				String[] temp = line.split(": ");
+		        switch(temp[0]) {
+		        	case "class" :
+		        		defaultClass.set(temp[1]);
+		        		break;
+		        	case "color" :
+		        		defaultColor = Color.web(temp[1]);
+		        		break;
+		        	case "border" :
+		        		defaultBorderColor = Color.web(temp[1]);
+		        }
+		    }
+			reader.close();
+			
+			file = new File("config/flags_color.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while ((line = reader.readLine()) != null) {
+				String[] temp = line.split(" : ");
+		        colorsOfFlags.put(temp[0], new SimpleObjectProperty<Color>(Color.web(temp[1])) );
+		    }
+			reader.close();
+			
+			file = new File("config/collors.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while ((line = reader.readLine()) != null) {
+				colors.add(line);
+		    }
+			reader.close();
+				
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

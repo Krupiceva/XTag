@@ -15,6 +15,7 @@ where I work as a student.
     <li>Rectangle border color for every class</li>
     <li>Flags color</li>
     <li>Default class</li>
+    <li>Changing classes order with drag and drop</li>
   </ul>
   </li>
   <li>New visualization:<br>
@@ -36,6 +37,27 @@ where I work as a student.
     </ul>
   </li>
   <li>On the first screen is added statistics of how many annotations there are in dataset (bar chart with every classes separately)</li>
+  <li>Color annotatin:<br>
+    <ul>
+      <li>On every annotation user can add color</li>
+      <li>Keyboard shortcuts: SHIFT+number (First 9 colors can have shortcuts)</li>
+    </ul>
+  </li>
+  <li>Total number of annotations in dataset is added</li>
+  <li>New Zoom:<br>
+    <ul>
+      <li>Automatically fit image to screen size</li>
+      <li>Moving in zoomed in image with middle mouse button</li>
+    </ul>
+  </li>
+  <li>Edit mode:<br>
+    <ul>
+      <li>When user is in edit mode, moving through the anotation list opens edit windows for that annotation</li>
+      <li>Only the selected annotation is displayed and others are invisible</li>
+      <li>With right mouse button pressed on image, user display all annotations</li>
+    </ul>
+  </li>
+  <li>Undo/Redo functionality: IN PROGRESS</li>
 </ul>
 
 *XTag v1.3

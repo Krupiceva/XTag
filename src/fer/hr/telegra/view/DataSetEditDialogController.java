@@ -8,7 +8,10 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import fer.hr.telegra.model.*;
 
@@ -34,6 +37,7 @@ public class DataSetEditDialogController {
 	private Stage dialogStage;
 	private DataSet dataSet;
 	private boolean okClicked = false;
+	PathData pathData = PathData.getInstance();
 	
 	/**
      * Initializes the controller class. This method is automatically called
@@ -148,6 +152,10 @@ public class DataSetEditDialogController {
     @FXML
     private void handleBrowse() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = 
                 directoryChooser.showDialog(dialogStage);
     	//LastPath.setLastFilePath(selectedDirectory);
@@ -156,6 +164,14 @@ public class DataSetEditDialogController {
             //locationField.setText("No Directory selected");
         }else{
             imagesLocationField.setText(selectedDirectory.getAbsolutePath());
+            pathData.path = selectedDirectory.getAbsolutePath();
+            try {
+    			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+    			writer.write(pathData.path);
+    		    writer.close();
+    		} catch(IOException e) {
+    			e.printStackTrace();
+    		}
         }
     }
     
@@ -165,6 +181,10 @@ public class DataSetEditDialogController {
     @FXML
     private void handleBrowse1() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = 
                 directoryChooser.showDialog(dialogStage);
     	//LastPath.setLastFilePath(selectedDirectory);
@@ -173,6 +193,14 @@ public class DataSetEditDialogController {
             //locationField.setText("No Directory selected");
         }else{
             annotationsLocationField.setText(selectedDirectory.getAbsolutePath());
+            pathData.path = selectedDirectory.getAbsolutePath();
+            try {
+    			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+    			writer.write(pathData.path);
+    		    writer.close();
+    		} catch(IOException e) {
+    			e.printStackTrace();
+    		}
         }
     }
     

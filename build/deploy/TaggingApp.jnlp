@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="TaggingApp.jar" size="575817" download="eager" />
+    <jar href="TaggingApp.jar" size="491633" download="eager" />
     <jar href="libs\artoolkitplus-android-arm.jar" size="315890" download="eager" />
     <jar href="libs\artoolkitplus-android-x86.jar" size="404918" download="eager" />
     <jar href="libs\artoolkitplus-linux-armhf.jar" size="146986" download="eager" />

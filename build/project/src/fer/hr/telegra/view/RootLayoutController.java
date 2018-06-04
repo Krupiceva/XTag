@@ -111,7 +111,7 @@ public class RootLayoutController {
         alert.setTitle("Xtag");
         alert.initOwner(mainApp.getPrimaryStage());
         alert.setHeaderText("About");
-        alert.setContentText("Author: Dora Mlinariæ\n");
+        alert.setContentText("Author: Dora Mlinariæ\nVersion: 2.0.0\n");
         Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
         alert.setGraphic(new ImageView(appIcon));
         
@@ -125,6 +125,14 @@ public class RootLayoutController {
     @FXML
     private void handleExportFrames() {
     	mainApp.showExportFramesDialog();
+    }
+    
+    /**
+     * Opens annotations config dialog
+     */
+    @FXML
+    private void handleConfigAnnotations() {
+    	mainApp.showConfigAnnotations();
     }
 
     /**

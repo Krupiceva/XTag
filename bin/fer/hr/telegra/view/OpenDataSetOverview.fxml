@@ -157,7 +157,7 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button contentDisplay="TOP" layoutX="625.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleFitZoomToScreenButton" text="Fit">
+                              <Button fx:id="fitToScreenButton" contentDisplay="TOP" layoutX="625.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleFitZoomToScreenButton" text="Fit">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>

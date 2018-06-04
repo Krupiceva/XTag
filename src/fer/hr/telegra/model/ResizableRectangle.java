@@ -34,7 +34,7 @@ public class ResizableRectangle extends Rectangle {
         this.mainApp = mainApp;
         group.getChildren().add(this);
         super.setStroke(mainApp.getDefaultBorderColor());
-        super.setStrokeWidth(2);
+        super.setStrokeWidth(1);
         super.setStrokeType(StrokeType.INSIDE);
         super.setFill(mainApp.getDefaultColor());
 

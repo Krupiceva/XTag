@@ -3,6 +3,7 @@ package fer.hr.telegra.model;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.util.Iterator;
@@ -39,6 +40,8 @@ public class DataSet {
      * The data as an observable list of DataImages (with annotations and verified);
      */
     private ObservableList<DataImage> dataSetVerifiedImages = FXCollections.observableArrayList();
+    
+    private ObservableMap<String, Integer> annotations = FXCollections.observableHashMap();
     
 	
 	/**
@@ -185,6 +188,14 @@ public class DataSet {
     			dataSetVerifiedImages.remove(dataSetVerifiedImages.indexOf(img)); 			
     		}
     	}
+    }
+    
+    public ObservableMap<String, Integer> getAnnotations() {
+    	return annotations;
+    }
+    
+    public void setAnnotations(ObservableMap<String, Integer> annotations) {
+    	this.annotations = annotations;
     }
     
     public Double getCameraAngle() {

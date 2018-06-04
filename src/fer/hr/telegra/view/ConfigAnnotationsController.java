@@ -3,16 +3,26 @@ package fer.hr.telegra.view;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import fer.hr.telegra.MainApp;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -57,17 +67,23 @@ public class ConfigAnnotationsController {
 	@FXML
     private void initialize() {
 		colorPicker.setDisable(true);
-		listOfAnnotations.getSelectionModel().selectedItemProperty()
-		.addListener((observable, oldValue, newValue) -> {
-			annotationLabel.setText(newValue);
-			colorPicker.setValue(mainApp.getColorOfClasses().get(newValue).get());
-			if(!newValue.equals(mainApp.getDefaultClass())) {
-				defaultClassButton.setDisable(false);
+		listOfAnnotations.setCellFactory(param -> new DragNDropCell());
+		listOfAnnotations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != null) {
+				annotationLabel.setText(newValue);
+				colorPicker.setValue(mainApp.getColorOfClasses().get(newValue).get());
+				if (!newValue.equals(mainApp.getDefaultClass())) {
+					defaultClassButton.setDisable(false);
+				} else {
+					defaultClassButton.setDisable(true);
+				}
+				colorPicker.setDisable(false);
 			}
 			else {
+				annotationLabel.setText("");
 				defaultClassButton.setDisable(true);
+				colorPicker.setDisable(true);
 			}
-			colorPicker.setDisable(false);
 		});
 		flagsColor.getItems().add("Overlap");
 		flagsColor.getItems().add("Truncated");
@@ -233,5 +249,90 @@ public class ConfigAnnotationsController {
 	@FXML
 	private void handleClose() {
 		dialogStage.close();
+	}
+	
+	private class DragNDropCell extends ListCell<String> {
+		public DragNDropCell() {
+			setOnDragDetected(event -> {
+				if(getItem() == null) {
+					return;
+				}
+				
+				ObservableList<String> items = getListView().getItems();
+				Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putString(getItem());
+                dragboard.setContent(content);
+                event.consume();
+			});
+			setOnDragOver(event -> {
+                if (event.getGestureSource() != this &&
+                       event.getDragboard().hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+
+                event.consume();
+            });
+            setOnDragEntered(event -> {
+                if (event.getGestureSource() != this &&
+                        event.getDragboard().hasString()) {
+                    setOpacity(0.3);
+                }
+            });
+            setOnDragExited(event -> {
+                if (event.getGestureSource() != this &&
+                        event.getDragboard().hasString()) {
+                    setOpacity(1);
+                }
+            });
+            setOnDragDropped(event -> {
+            	if(getItem() == null) {
+            		return;
+            	}
+            	Dragboard db = event.getDragboard();
+                boolean success = false;
+                
+                if (db.hasString()) {
+                    ObservableList<String> items = getListView().getItems();
+                    int draggedIdx = items.indexOf(db.getString());
+                    int thisIdx = items.indexOf(getItem());
+
+                    items.set(draggedIdx, getItem());
+                    items.set(thisIdx, db.getString());
+
+                    ObservableList<String> itemscopy = FXCollections.observableArrayList(getListView().getItems());
+                    getListView().getItems().setAll(itemscopy);
+                    mainApp.getAnnotations().setAll(itemscopy);
+
+                    try {
+            			BufferedWriter writer = new BufferedWriter(new FileWriter("config/annotations_config.txt"));
+            			for(String annotation: mainApp.getAnnotations()) {
+            				writer.write(annotation);
+        					writer.newLine();
+            			}
+            		    writer.close();
+            		} catch(IOException e) {
+            			e.printStackTrace();
+            		}
+                    
+                    success = true;
+                }
+                
+                event.setDropCompleted(success);
+
+                event.consume();
+            });
+            setOnDragDone(DragEvent::consume);
+		}
+		@Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if(!empty | item != null) {
+            	this.setText(item);
+            }
+            else {
+            	this.setText(null);
+            }
+        }
 	}
 }

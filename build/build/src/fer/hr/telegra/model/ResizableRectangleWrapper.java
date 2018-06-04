@@ -14,6 +14,7 @@ public class ResizableRectangleWrapper {
 
 	private ResizableRectangle rectangle;
 	private StringProperty klass;
+	private StringProperty color;
 	private StringProperty additionalText;
 	private BooleanProperty isTruncated;
 	private BooleanProperty isDifficult;
@@ -36,6 +37,7 @@ public class ResizableRectangleWrapper {
 		IntegerProperty widthProp = new SimpleIntegerProperty(0);
 		IntegerProperty heightProp = new SimpleIntegerProperty(0);
 		this.klass = new SimpleStringProperty("");
+		this.color = new SimpleStringProperty("");
 		this.additionalText = new SimpleStringProperty("");
 		this.isTruncated = new SimpleBooleanProperty(false);
 		this.isDifficult = new SimpleBooleanProperty(false);
@@ -68,6 +70,18 @@ public class ResizableRectangleWrapper {
 	
 	public StringProperty klassProperty() {
 		return klass;
+	}
+	
+	public String getColor() {
+		return color.get();
+	}
+	
+	public void setColor(String color) {
+		this.color.set(color);
+	}
+	
+	public StringProperty colorProperty() {
+		return color;
 	}
 	
 	public String getAdditionalText() {

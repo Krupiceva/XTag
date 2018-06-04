@@ -12,17 +12,23 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="300.0" prefWidth="400.0" stylesheets="@DarkTheme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fer.hr.telegra.view.EditAnnotationDialogController">
+<AnchorPane prefHeight="300.0" prefWidth="500.0" stylesheets="@DarkTheme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fer.hr.telegra.view.EditAnnotationDialogController">
    <children>
-      <SplitPane dividerPositions="0.38944723618090454" layoutX="87.0" layoutY="164.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.38944723618090454, 0.5" layoutX="87.0" layoutY="164.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <AnchorPane maxWidth="-Infinity" prefHeight="160.0" prefWidth="100.0">
                <children>
                   <Label layoutX="14.0" layoutY="14.0" text="This is:" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
                   <ListView fx:id="listOfAnnotations" layoutX="-39.0" layoutY="111.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0" />
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <AnchorPane maxWidth="-Infinity" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <ListView fx:id="listOfColors" layoutX="-44.0" layoutY="43.0" prefHeight="298.0" prefWidth="156.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0" />
+                  <Label layoutY="6.0" text="Color:" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+               </children>
+            </AnchorPane>
+          <AnchorPane prefHeight="160.0" prefWidth="100.0">
                <children>
                   <ButtonBar layoutX="209.0" layoutY="344.0" prefHeight="43.0" prefWidth="237.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="5.0">
                     <buttons>

@@ -14,6 +14,7 @@
   <segmented>0</segmented>
   <object>
     <name>car</name>
+    <color>Grey</color>
     <text/>
     <pose>Unspecified</pose>
     <truncated>0</truncated>
