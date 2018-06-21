@@ -3,9 +3,6 @@ package fer.hr.telegra.view;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import fer.hr.telegra.MainApp;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -18,38 +15,77 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
+/**
+ * Controller class for configuration of annotations options
+ * @author dmlinaric
+ *
+ */
 public class ConfigAnnotationsController {
-
+	/**
+	 * Reference to mainApp
+	 */
 	private MainApp mainApp;
+	/**
+	 * Stage of this dialog window
+	 */
 	private Stage dialogStage;
+	/**
+	 * Listview with all possible annotation classes in application
+	 */
 	@FXML
     private ListView<String>  listOfAnnotations;
+	/**
+	 * Label with selected annotation class
+	 */
 	@FXML
 	private Label annotationLabel;
+	/**
+	 * Colorpicker for selected annotation fill color
+	 */
 	@FXML
 	private ColorPicker colorPicker;
+	/**
+	 * Colorpicker for color of all annotation classes (default)
+	 */
 	@FXML
 	private ColorPicker allColorPicker;
 	@FXML
+	/**
+	 * Colorpicker for color of all annotation border
+	 */
 	private ColorPicker allBorderColorPicker;
+	/**
+	 * Colorpicker for color of al flags
+	 */
 	@FXML
 	private ColorPicker flagsColorPicker;
+	/**
+	 * Combobox with all possible flags
+	 */
 	@FXML
 	private ComboBox<String> flagsColor = new ComboBox<>();
+	/**
+	 * Button for making selected annotation class default
+	 */
 	@FXML
 	private Button defaultClassButton;
+	/**
+	 * Textfield for name of new annotation class
+	 */
 	@FXML
 	private TextField newAnnotation;
 	
-	
+	/**
+	 * Give controller access to mainApp
+	 * Populate data with data from mainApp
+	 * @param mainApp
+	 */
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 		listOfAnnotations.setEditable(true);
@@ -64,6 +100,9 @@ public class ConfigAnnotationsController {
 		this.dialogStage.setResizable(false);
 	}
 	
+	/**
+	 * initialize controller class
+	 */
 	@FXML
     private void initialize() {
 		colorPicker.setDisable(true);
@@ -139,7 +178,6 @@ public class ConfigAnnotationsController {
 		mainApp.getColorOfClasses().forEach( (k,v) ->  {
 			v.set(allColorPicker.getValue());
 		});
-		//mainApp.getColorOfClasses().replaceAll((k, v) -> allColorPicker.getValue());
 		mainApp.setDefaultColor(allColorPicker.getValue());
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter("config/annotations_colors.txt"));
@@ -200,13 +238,13 @@ public class ConfigAnnotationsController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//mainApp.getColorOfClasses().put(newAnnotation.getText(), mainApp.getDefaultColor());
-		mainApp.getColorOfClasses().get(newAnnotation.getText()).set(mainApp.getDefaultColor());
+		mainApp.getColorOfClasses().put(newAnnotation.getText(), new SimpleObjectProperty<Color>(mainApp.getDefaultColor()));
+		//mainApp.getColorOfClasses().get(newAnnotation.getText()).set(mainApp.getDefaultColor());
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter("config/annotations_colors.txt"));
 			mainApp.getColorOfClasses().forEach( (k,v) -> {
 				try {
-					writer.write(k + " : " + v);
+					writer.write(k + " : " + v.get());
 					writer.newLine();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -251,6 +289,11 @@ public class ConfigAnnotationsController {
 		dialogStage.close();
 	}
 	
+	/**
+	 * Inner class that represent new list cell with drag and drop implemented
+	 * @author dmlinaric
+	 *
+	 */
 	private class DragNDropCell extends ListCell<String> {
 		public DragNDropCell() {
 			setOnDragDetected(event -> {
@@ -258,7 +301,6 @@ public class ConfigAnnotationsController {
 					return;
 				}
 				
-				ObservableList<String> items = getListView().getItems();
 				Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent content = new ClipboardContent();
                 content.putString(getItem());
@@ -303,7 +345,10 @@ public class ConfigAnnotationsController {
                     ObservableList<String> itemscopy = FXCollections.observableArrayList(getListView().getItems());
                     getListView().getItems().setAll(itemscopy);
                     mainApp.getAnnotations().setAll(itemscopy);
-
+                    
+                    /**
+                     * When drag is droped then save new order to the config file
+                     */
                     try {
             			BufferedWriter writer = new BufferedWriter(new FileWriter("config/annotations_config.txt"));
             			for(String annotation: mainApp.getAnnotations()) {

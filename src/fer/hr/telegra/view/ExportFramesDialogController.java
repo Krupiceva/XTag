@@ -1,7 +1,10 @@
 package fer.hr.telegra.view;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +16,7 @@ import org.bytedeco.javacv.Java2DFrameConverter;
 //import org.opencv.videoio.VideoCapture;
 
 import fer.hr.telegra.MainApp;
+import fer.hr.telegra.model.PathData;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -41,6 +45,8 @@ public class ExportFramesDialogController {
 	private TextField maxNumberOfImages;
 	@FXML
 	private TextField imagePrefix;
+	
+	PathData pathData = PathData.getInstance();
     
 	public ExportFramesDialogController() {}
 	
@@ -63,7 +69,10 @@ public class ExportFramesDialogController {
     @FXML
     private void handleBrowseAvi() {
     	FileChooser fileChooser = new FileChooser();
-
+    	File last = new File(pathData.path);
+    	if(last.isDirectory()) {
+    		fileChooser.setInitialDirectory(last);
+    	}
         // Set extension filter
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "AVI files (*.avi)", "*.avi");
@@ -73,15 +82,35 @@ public class ExportFramesDialogController {
         File file = fileChooser.showOpenDialog(mainApp.getPrimaryStage());
         if (file != null) {
         	aviLocation.setText(file.getAbsolutePath());
+        	pathData.path = file.getParent();
+        	try {
+     			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+     			writer.write(pathData.path);
+     		    writer.close();
+     		} catch(IOException e) {
+     			e.printStackTrace();
+     		}
         }
     }
     
     @FXML
     private void handleBrowseFolder() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = directoryChooser.showDialog(dialogStage);
     	if(selectedDirectory != null) {
     		exportLocation.setText(selectedDirectory.getAbsolutePath());
+    		 pathData.path = selectedDirectory.getAbsolutePath();
+             try {
+     			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+     			writer.write(pathData.path);
+     		    writer.close();
+     		} catch(IOException e) {
+     			e.printStackTrace();
+     		}
     	}
     }
     

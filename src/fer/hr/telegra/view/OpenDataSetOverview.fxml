@@ -25,7 +25,7 @@
    <children>
       <SplitPane fx:id="splitPaneHor" dividerPositions="0.1502, 0.93" prefHeight="500.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minWidth="250.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
+          <AnchorPane minWidth="260.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                <children>
                   <SplitPane dividerPositions="0.3024193548387097, 0.5362903225806451, 0.7600806451612904" orientation="VERTICAL" prefHeight="498.0" prefWidth="235.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>

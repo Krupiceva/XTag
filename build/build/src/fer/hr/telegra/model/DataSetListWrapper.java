@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Helper class to wrap a list of datasets. This is used for saving the list of datasets to XML
  * Xml is simple database of datasets
+ * Automatically handled with getters and setters in dataset model class
+ * @author dmlinaric
  *
  */
 @XmlRootElement(name = "dataSets")

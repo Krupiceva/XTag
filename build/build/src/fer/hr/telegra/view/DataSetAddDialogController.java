@@ -14,57 +14,113 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Iterator;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.magicwerk.brownies.collections.BigList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import fer.hr.telegra.model.*;
-
+/**
+ * Controller class for adding new dataset to the database of application
+ * @author dmlinaric
+ *
+ */
 public class DataSetAddDialogController {
-
+	/**
+	 * Textfiled with name of new dataset
+	 */
 	@FXML
 	private TextField nameField;
+	/**
+	 * Textfiled with camera angle of new dataset
+	 */
 	@FXML
 	private TextField cameraAngleField;
+	/**
+	 * Combobox with all possbile enums of weather conditions in new dataset
+	 */
 	@FXML
 	private ComboBox<WeatherConditions> weatherConditionCombo = new ComboBox<>();
+	/**
+	 * Textfiled with camera high of new datset
+	 */
 	@FXML
 	private TextField cameraHighField;
+	/**
+	 * Combobox with all possible image quality in new dataset
+	 */
 	@FXML
 	private ComboBox<ImageQuality> imageQualityCombo = new ComboBox<>();
+	/**
+	 * Combobox with all possible times of the day in images in new dataset
+	 */
 	@FXML
 	private ComboBox<TimeOfTheDay> timeOfTheDayCombo = new ComboBox<>();
+	/**
+	 * Textfiled with path to folder with images in dataset
+	 */
 	@FXML
 	private TextField imagesLocationField;
+	/**
+	 * Textfield with path to folder with annotations in dataset
+	 */
 	@FXML
 	private TextField annotationsLocationField;
+	/**
+	 * Progress bar that shows percent of importing images and annotations to database
+	 */
 	@FXML
 	private ProgressBar progressBar;
+	/**
+	 * Progress indicator that shows percent of importing images and annotations to database
+	 */
 	@FXML
 	private ProgressIndicator progressIndicator;
+	/**
+	 * Label that shows which image is current importing
+	 */
 	@FXML
 	private Label statusLabel;
+	/**
+	 * Button for importing new dataset
+	 */
 	@FXML
 	private Button importBtn;
+	/**
+	 * Button for canceling import
+	 */
 	@FXML
 	private Button cancel;
+	/**
+	 * Button when import is finished
+	 */
 	@FXML
 	private Button ok;
-	
+	/**
+	 * Stage of this dialog window
+	 */
 	private Stage dialogStage;
+	/**
+	 * reference to the new added dataset
+	 */
 	private DataSet dataSet;
 	private boolean okClicked = false;
+	/**
+	 * Importtask for importing images that will be executed in separate theard
+	 */
 	ImportTask importTask;
+	/**
+	 * Instance of singleton class that held information of last used path in application
+	 */
+	PathData pathData = PathData.getInstance();
 	
 	/**
      * Initializes the controller class. This method is automatically called
@@ -77,11 +133,11 @@ public class DataSetAddDialogController {
     	imageQualityCombo.getItems().setAll(ImageQuality.values());
     	timeOfTheDayCombo.getItems().setAll(TimeOfTheDay.values());
     	ok.setDisable(true);
+    	cancel.setDisable(true);
     }
 
     /**
      * Sets the stage of this dialog.
-     * 
      * @param dialogStage
      */
     public void setDialogStage(Stage dialogStage) {
@@ -94,13 +150,11 @@ public class DataSetAddDialogController {
     
     
     /**
-     * Sets the dataset to be edited in the dialog.
-     * 
-     * @param dataSet
+     * Sets the dataset to be added in the dialog
+     * @param dataSet is new dataset
      */
     public void setDataSet (DataSet dataSet) {
     	this.dataSet = dataSet;
-    	
     	nameField.setText(dataSet.getDataSetName());
     	imagesLocationField.setText(dataSet.getDataSetImagesLocation());
     	annotationsLocationField.setText(dataSet.getDataSetAnnotationsLocation());
@@ -113,7 +167,6 @@ public class DataSetAddDialogController {
     
     /**
      * Returns true if the user clicked OK, false otherwise.
-     * 
      * @return
      */
     public boolean isOkClicked() {
@@ -121,13 +174,17 @@ public class DataSetAddDialogController {
     }
     
     /**
-     * Method which is called when user clicks ok.
+     * Method which is called when user clicks import.
+     * Initialize components
+     * Bind progress bar with import task progress
+     * Put import task in separate thread
      */
     @FXML
     private void handleImport() {
     	if (isInputValid()) {
     		importBtn.setDisable(true);
     		ok.setDisable(true);
+    		cancel.setDisable(false);
     		progressBar.setProgress(0);
             progressIndicator.setProgress(0);
             cancel.setDisable(false);
@@ -144,21 +201,20 @@ public class DataSetAddDialogController {
 
                         @Override
                         public void handle(WorkerStateEvent t) {
-                            //dataSet = importTask.getValue();
                             statusLabel.textProperty().unbind();
                             statusLabel.setText("Imported!");
                             ok.setDisable(false);
                             okClicked = true;
-                    		//dialogStage.close();
                         }
                     });
 			 new Thread(importTask).start();
-			 //System.out.println(dataSet.getDataSetName());
     	}
     }
     
     /**
      * Method which is called when user clicks cancel.
+     * Cancel import task in thread
+     * Unbind progress bar with import task progress
      */
     @FXML
     private void handleCancel() {
@@ -170,12 +226,14 @@ public class DataSetAddDialogController {
     	progressBar.progressProperty().unbind();
         progressIndicator.progressProperty().unbind();
         statusLabel.textProperty().unbind();
-        //
         progressBar.setProgress(0);
         progressIndicator.setProgress(0);
-    	//dialogStage.close();
     }
     
+    /**
+     * Method which is called when user clicks ok.
+     * It close this dialog window
+     */
     @FXML
     private void handleOK() {
     	dialogStage.close();
@@ -187,6 +245,10 @@ public class DataSetAddDialogController {
     @FXML
     private void handleBrowse() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = 
                 directoryChooser.showDialog(dialogStage);
     	//LastPath.setLastFilePath(selectedDirectory);
@@ -195,6 +257,14 @@ public class DataSetAddDialogController {
             //locationField.setText("No Directory selected");
         }else{
             imagesLocationField.setText(selectedDirectory.getAbsolutePath());
+            pathData.path = selectedDirectory.getAbsolutePath();
+            try {
+    			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+    			writer.write(pathData.path);
+    		    writer.close();
+    		} catch(IOException e) {
+    			e.printStackTrace();
+    		}
         }
     }
     
@@ -204,6 +274,10 @@ public class DataSetAddDialogController {
     @FXML
     private void handleBrowse1() {
     	DirectoryChooser directoryChooser = new DirectoryChooser();
+    	File file = new File(pathData.path);
+    	if(file.isDirectory()) {
+    		directoryChooser.setInitialDirectory(file);
+    	}
     	File selectedDirectory = 
                 directoryChooser.showDialog(dialogStage);
     	//LastPath.setLastFilePath(selectedDirectory);
@@ -212,6 +286,14 @@ public class DataSetAddDialogController {
             //locationField.setText("No Directory selected");
         }else{
             annotationsLocationField.setText(selectedDirectory.getAbsolutePath());
+            pathData.path = selectedDirectory.getAbsolutePath();
+            try {
+    			BufferedWriter writer = new BufferedWriter(new FileWriter("config/path_data.txt"));
+    			writer.write(pathData.path);
+    		    writer.close();
+    		} catch(IOException e) {
+    			e.printStackTrace();
+    		}
         }
     }
     
@@ -287,7 +369,7 @@ public class DataSetAddDialogController {
     	}
     }
     
- // array of supported extensions (use a List if you prefer)
+    // array of supported extensions (use a List if you prefer)
     static final String[] EXTENSIONS = new String[]{
         "gif", "png", "bmp", "jpg", "jpeg" // and other formats you need
     };
@@ -305,11 +387,14 @@ public class DataSetAddDialogController {
         }
     };
     
+    /**
+     * Inner class that represent task of importing new dataset in database
+     * @author dmlinaric
+     *
+     */
 	private class ImportTask extends Task<DataSet> {
-
 		@Override
 		protected DataSet call() throws Exception {
-
 			DataSet data = new DataSet();
 			dataSet.setDataSetName(nameField.getText());
 			dataSet.setDataSetImagesLocation(imagesLocationField.getText());
@@ -322,6 +407,11 @@ public class DataSetAddDialogController {
 
 			File dir = new File(imagesLocationField.getText());
 			// File[] files = dir.listFiles();
+			/**
+			 * Iterate trough all images in folder and check if exist xml file for that image
+			 * If exist parse xml and add all annotation for that image and image to dataset
+			 * Otherwise add only image
+			 */
 			BigList<File> images = BigList.create(dir.listFiles(IMAGE_FILTER));
 			Iterator<File> itr = images.iterator();
 			int i = 0;
@@ -348,8 +438,6 @@ public class DataSetAddDialogController {
 							dataSet.addDataSetImageWithAnnotations(dataImg);
 						}
 						
-						//PROBA
-						
 						NodeList nList = doc.getElementsByTagName("object");
 						for (int j = 0; j < nList.getLength(); j++) {
 							Node nNode = nList.item(j);
@@ -366,7 +454,6 @@ public class DataSetAddDialogController {
 								}
 							}
 						}
-						//PROBA
 						
 					} catch (Exception e) {
 						e.printStackTrace();

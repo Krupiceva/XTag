@@ -13,10 +13,14 @@ import org.magicwerk.brownies.collections.BigList;
 import javafx.beans.property.*;
 
 /**
- * Model class for DataSet of images/frames(video)
+ * Main model class of dataset with images (frames in video)
+ * @author dmlinaric
  *
  */
 public class DataSet {
+	/**
+	 * Attributes of dataset
+	 */
 	private final StringProperty dataSetName;
 	private StringProperty dataSetImagesLocation;
 	private StringProperty dataSetAnnotationsLocation;
@@ -41,6 +45,9 @@ public class DataSet {
      */
     private ObservableList<DataImage> dataSetVerifiedImages = FXCollections.observableArrayList();
     
+    /**
+     * The Map with counter of every annotation class in dataset
+     */
     private ObservableMap<String, Integer> annotations = FXCollections.observableHashMap();
     
 	
@@ -52,11 +59,11 @@ public class DataSet {
     }
     
     /**
-     * Constructor with initial data. Initial for numOfImg, cameraAngle and cameraHigh is 0;
-     * Initial for weatherCondition and imageQuality is UNKNOWN
-     * Initial location is not selected
-     * 
-     * @param dataSetName
+     * Constructor with initial data:
+     * Initial cameraAngle and cameraHigh is 0;
+     * Initial for weatherCondition, imageQuality and timeOfTheDay is UNKNOWN
+     * Initial locations is not selected
+     * @param dataSetName is name of this datset
      */
     public DataSet(String dataSetName) {
     	this.dataSetName = new SimpleStringProperty(dataSetName);
@@ -69,22 +76,10 @@ public class DataSet {
     	this.timeOfTheDay = new SimpleObjectProperty<TimeOfTheDay>(TimeOfTheDay.Unknown);
     }
     
-    //UNAPRIJEDITI SRUSI SE ZA VELIK BROJ SLIKA
     /**
-     * Method which check if this dataset contains specified image
-     * @param path is string of absolute path to image
-     * @return true if contains, false otherwise
-     *
-    public boolean containsImage(String path) {
-    	for(DataImage img: dataSetImages) {
-    		if(img.getImagePath().equals(path)) {
-    			return true;
-    		}
-    	}
-    	return false;
-    }
-    */
-    
+     * Getters and setters for all attributes of dataset
+     * It must be with corresponding name because DataSetListWrapper and loading/saving in xml database 
+     */
     public String getDataSetName() {
     	return dataSetName.get();
     }
@@ -132,8 +127,12 @@ public class DataSet {
     public void addDataSetImage(DataImage image) {
     	dataSetImages.add(image);
     }
-    
+    /**
+     * Remove image from list
+     * @param imageName is name of image which needs to be removed from list of images without annotations
+     */
     public void removeDataSetImage(String imageName) {
+    	//Big list is fast collection implementation for bigdata
     	BigList<DataImage> images =  BigList.create(dataSetImages);
     	Iterator<DataImage> itr = images.iterator();
     	while(itr.hasNext()) {
@@ -155,8 +154,12 @@ public class DataSet {
     public void addDataSetImageWithAnnotations(DataImage image) {
     	dataSetImagesWithAnnotations.add(image);
     }
-    
+    /**
+     * Remove image from list
+     * @param imageName is name of image which needs to be removed from list of images with annotations
+     */
     public void removeDataSetImageWithAnnotations(String imageName) {
+    	//Big list is fast collection implementation for bigdata
     	BigList<DataImage> images =  BigList.create(dataSetImagesWithAnnotations);
     	Iterator<DataImage> itr = images.iterator();
     	while(itr.hasNext()) {
@@ -179,6 +182,10 @@ public class DataSet {
     	dataSetVerifiedImages.add(image);
     }
     
+    /**
+     * Remove image from list
+     * @param imageName is name of image which needs to be removed from list of verified images 
+     */
     public void removeDataSetVerifiedImage(String imageName) {
     	BigList<DataImage> images =  BigList.create(dataSetVerifiedImages);
     	Iterator<DataImage> itr = images.iterator();

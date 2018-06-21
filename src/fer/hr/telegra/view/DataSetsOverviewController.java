@@ -2,10 +2,7 @@ package fer.hr.telegra.view;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ImageQuality;
@@ -40,59 +37,127 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.scene.control.ButtonType;
-
+/**
+ * Controller class that shows overview of selected dataset and table of all datasets in database
+ * @author dmlinaric
+ *
+ */
 public class DataSetsOverviewController {
+	/**
+	 * Table with all dataset in database of application
+	 */
 	@FXML
 	private TableView<DataSet> dataSetTable;
+	/**
+	 * Column of table with name of dataset
+	 */
 	@FXML
 	private TableColumn<DataSet, String> dataSetNameColumn;
+	/**
+	 * Column of table with number of images in dataset
+	 */
 	@FXML
 	private TableColumn<DataSet, Integer> numOfImgColumn;
+	/**
+	 * Textfield for searching the dataset in table
+	 */
 	@FXML
 	private TextField filterField;
+	/**
+	 * Label with name of dataset
+	 */
 	@FXML
 	private Label dataSetNameLabel;
+	/**
+	 * Label with path to the folder with images in dataset
+	 */
 	@FXML
 	private Label dataSetImagesLocationLabel;
+	/**
+	 * Label with path to the folder with annotations in dataset
+	 */
 	@FXML
 	private Label dataSetAnnotationsLocationLabel;
+	/**
+	 * Label with number of images in dataset
+	 */
 	@FXML
 	private Label numOfImgLabel;
+	/**
+	 * Label with camera angle of dataset
+	 */
 	@FXML
 	private Label cameraAngleLabel;
+	/**
+	 * Label with camera high of dataset
+	 */
 	@FXML
 	private Label cameraHighLabel;
+	/**
+	 * Label with weather condition on images in dataset
+	 */
 	@FXML
 	private Label weatherConditionLabel;
+	/**
+	 * Label with quality of images in dataset
+	 */
 	@FXML
 	private Label imageQualityLabel;
+	/**
+	 * Label with time of the ay on images in dataset
+	 */
 	@FXML
 	private Label timeOfTheDayLabel;
 	@FXML
 	private SplitPane splitPaneHor;
+	/**
+	 * Button for open selected dataset
+	 */
 	@FXML
 	private Button openButton;
-	//@FXML
-	//private Button statButton;
+	/**
+	 * Button for adding new dataset
+	 */
 	@FXML
 	private Button addDataSet;
+	/**
+	 * Button for edit selected dataset
+	 */
 	@FXML
 	private Button editDataSet;
+	/**
+	 * Button for delete selected dataset
+	 */
 	@FXML
 	private Button deleteDataSet;
+	/**
+	 * Label that contains text "search"
+	 */
 	@FXML
 	private Label searchLabel;
+	/**
+	 * Label that shows how many annotations are in the dataset
+	 */
 	@FXML
 	private Label numberOfAnnotationsInSetLabel;
+	/**
+	 * Variable with number of annotations in dataset which is display on numberOfAnnotationsInSetLabel
+	 */
 	private Integer numberOfAnnotationsInSet;
+	/**
+	 * Bar chart for statistics of how many annotations classes are in dataset
+	 */
 	@FXML
     private BarChart<String, Integer> barChart;
-
     @FXML
     private CategoryAxis xAxis;
-    
+    /**
+     * List of all possible annotations classes for bar chart
+     */
     private ObservableList<String> annotationsName = FXCollections.observableArrayList();
-	// Reference to the main application.
+	/**
+	 * Reference to the mainApp
+	 */
     private MainApp mainApp;
     
     public DataSetsOverviewController() {
@@ -101,6 +166,8 @@ public class DataSetsOverviewController {
     /**
      * Initializes the controller class. This method is automatically called
      * after the fxml file has been loaded.
+     * Put images to the buttons
+     * Define event handlers
      */
     @FXML
     private void initialize() {
@@ -110,13 +177,11 @@ public class DataSetsOverviewController {
     	
     	//Add icons to buttons and labels
     	Image imageOpen = new Image(getClass().getResourceAsStream("/Actions-project-open-icon.png"));
-    	//Image imageStat = new Image(getClass().getResourceAsStream("/Actions-office-chart-bar-icon.png"));
     	Image imageSearch = new Image(getClass().getResourceAsStream("/Search-icon.png"));
     	Image imageAdd = new Image(getClass().getResourceAsStream("/Actions-document-new-icon.png"));
     	Image imageEdit = new Image(getClass().getResourceAsStream("/Actions-document-edit-icon.png"));
     	Image imageDelete = new Image(getClass().getResourceAsStream("/Actions-document-close-icon.png"));
     	openButton.setGraphic(new ImageView(imageOpen));
-    	//statButton.setGraphic(new ImageView(imageStat));
     	searchLabel.setGraphic(new ImageView(imageSearch));
     	addDataSet.setGraphic(new ImageView(imageAdd));
     	editDataSet.setGraphic(new ImageView(imageEdit));
@@ -125,6 +190,7 @@ public class DataSetsOverviewController {
     	//clear dataset details
     	showDataSetDetails(null);
     	
+    	//Open selected dataset on double click
     	dataSetTable.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
     		if(event.getClickCount() == 2) {
      		   handleOpen();
@@ -144,8 +210,7 @@ public class DataSetsOverviewController {
      * Is called by the main application to give a reference back to itself.
      * Observable list of datasets is in mainapp so we wrap observable list in filteredlist
      * and sorted list here 
-     * 
-     * @param mainApp
+     * @param mainApp reference ot the mainApp
      */
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
@@ -175,16 +240,12 @@ public class DataSetsOverviewController {
     	sortedData.comparatorProperty().bind(dataSetTable.comparatorProperty());
     	
     	dataSetTable.setItems(sortedData);
-    	
-    	/**
-    	xAxis.setCategories(mainApp.getAnnotations());
-     	for(String ant: mainApp.getAnnotations()) {
-     		stat.put(ant, 0);
-     	}
-     	*/
-
     }
     
+    /**
+     * Show information and bar chart for selected dataset
+     * @param dataSet is selected dataset
+     */
     private void showDataSetDetails(DataSet dataSet) {
     	if(dataSet != null) {
     		dataSetNameLabel.setText(dataSet.getDataSetName());
@@ -203,7 +264,6 @@ public class DataSetsOverviewController {
     		numberOfAnnotationsInSet = 0;
     		dataSet.getAnnotations().forEach((k,v) -> {
     			annotationsName.add(k);
-    			//series.getData().add(new XYChart.Data<>(k,v));
     			numberOfAnnotationsInSet = numberOfAnnotationsInSet + v;
     			final XYChart.Data<String, Integer> data = new Data<String, Integer>(k, v);
 //    			 data.nodeProperty().addListener(new ChangeListener<Node>() {
@@ -219,8 +279,10 @@ public class DataSetsOverviewController {
     		
     		xAxis.setCategories(annotationsName);
     		barChart.getData().add(series);
-    		
-    		
+
+    		/**
+    		 * Iterate trough all annotation classes on xAxis and for every color every node with color of class that represent
+    		 */
 			for (int i = 0; i < annotationsName.size(); i++) {
 				String lookup = ".data" + i + ".chart-bar";
 				for (Node n : barChart.lookupAll(lookup)) {

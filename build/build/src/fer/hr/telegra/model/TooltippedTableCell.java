@@ -13,11 +13,7 @@ import javafx.util.converter.DefaultStringConverter;
 /**
  * Just like a normal table cell, but each table cell has a tooltip that will display its contents. This makes
  * it easier for the user: they can read the contents without having to expand the table cell.
- * <p>
- * Look it's easy:
- * <code>
- * someColumn.setCellFactory(TooltippedTableCell.forTableColumn());
- * </code>
+ * @author dmlinaric
  */
 public class TooltippedTableCell<S, T> extends TableCell<S, T> {
     public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {

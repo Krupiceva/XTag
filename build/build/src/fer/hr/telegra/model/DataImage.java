@@ -4,12 +4,12 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * Model class for image/frame.
+ * Model class for image in dataset
+ * @author dmlinaric
  *
  */
 public class DataImage {
 	private final StringProperty imageName;
-	//private ObservableList<ResizableRectangleWrapper> annotations = FXCollections.observableArrayList();
 	
 	/**
      * Default constructor.
@@ -35,19 +35,4 @@ public class DataImage {
     public StringProperty imageNameProperty() {
     	return imageName;
     }
-    //Ne koristim jos, koristit cu kad cu imat bazu
-    /**
-    public ObservableList<ResizableRectangleWrapper> getAnnotations(){
-    	return annotations;
-    }
-    
-    public void setAnnotations(ObservableList<ResizableRectangleWrapper> annotations) {
-    	this.annotations = annotations;
-    }
-    
-    public void addAnnotation(ResizableRectangleWrapper annotation) {
-    	this.annotations.add(annotation);
-    }
-    */
-
 }

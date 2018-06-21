@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<annotation verified="no">
+  <folder>images</folder>
+  <filename>dwg_cam01_v1_12.jpg</filename>
+  <path>sample\images\dwg_cam01_v1_12.jpg</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>1920</width>
+    <height>1080</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>bus</name>
+    <color>Unknown</color>
+    <text/>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <overlap>0</overlap>
+    <aspect_ratio>0.0</aspect_ratio>
+    <bndbox>
+      <xmin>706</xmin>
+      <ymin>399</ymin>
+      <xmax>905</xmax>
+      <ymax>572</ymax>
+    </bndbox>
+  </object>
+</annotation>

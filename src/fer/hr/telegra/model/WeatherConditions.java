@@ -1,5 +1,10 @@
 package fer.hr.telegra.model;
-
+/**
+ * Enum class for weather conditions on images in dataset
+ * This is annotation of whole dataset
+ * @author dmlinaric
+ *
+ */
 public enum WeatherConditions {
 	Unknown, Cloudy, Sunny, Rainy, Snowy, Mix;
 	

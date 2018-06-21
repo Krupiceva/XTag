@@ -14,29 +14,64 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import fer.hr.telegra.model.*;
-
+/**
+ * Controller class for editing selected dataset
+ * @author dmlinaric
+ *
+ */
 public class DataSetEditDialogController {
-	
+	/**
+	 * Textfiled with name of new dataset
+	 */
 	@FXML
 	private TextField nameField;
+	/**
+	 * Textfiled with camera angle of new dataset
+	 */
 	@FXML
 	private TextField cameraAngleField;
+	/**
+	 * Combobox with all possbile enums of weather conditions in new dataset
+	 */
 	@FXML
 	private ComboBox<WeatherConditions> weatherConditionCombo = new ComboBox<>();
+	/**
+	 * Textfiled with camera high of new datset
+	 */
 	@FXML
 	private TextField cameraHighField;
+	/**
+	 * Combobox with all possible image quality in new dataset
+	 */
 	@FXML
 	private ComboBox<ImageQuality> imageQualityCombo = new ComboBox<>();
+	/**
+	 * Combobox with all possible times of the day in images in new dataset
+	 */
 	@FXML
 	private ComboBox<TimeOfTheDay> timeOfTheDayCombo = new ComboBox<>();
+	/**
+	 * Textfiled with path to folder with images in dataset
+	 */
 	@FXML
 	private TextField imagesLocationField;
+	/**
+	 * Textfield with path to folder with annotations in dataset
+	 */
 	@FXML
 	private TextField annotationsLocationField;
-	
+	/**
+	 * Stage of this dialog window
+	 */
 	private Stage dialogStage;
+	/**
+	 * Dataset that is selected to be edit
+	 */
 	private DataSet dataSet;
 	private boolean okClicked = false;
+	/**
+	 * Instance of singleton class that held information of last used path in application
+	 */
 	PathData pathData = PathData.getInstance();
 	
 	/**
@@ -64,12 +99,11 @@ public class DataSetEditDialogController {
     
     /**
      * Sets the dataset to be edited in the dialog.
-     * 
+     * Populate information with dataset data
      * @param dataSet
      */
     public void setDataSet (DataSet dataSet) {
     	this.dataSet = dataSet;
-    	
     	nameField.setText(dataSet.getDataSetName());
     	imagesLocationField.setText(dataSet.getDataSetImagesLocation());
     	annotationsLocationField.setText(dataSet.getDataSetAnnotationsLocation());
@@ -82,7 +116,6 @@ public class DataSetEditDialogController {
     
     /**
      * Returns true if the user clicked OK, false otherwise.
-     * 
      * @return
      */
     public boolean isOkClicked() {
@@ -91,6 +124,7 @@ public class DataSetEditDialogController {
     
     /**
      * Method which is called when user clicks ok.
+     * If input is valid put new information to dataset
      */
     @FXML
     private void handleOK() {
@@ -102,37 +136,7 @@ public class DataSetEditDialogController {
     		dataSet.setCameraHigh(Double.parseDouble(cameraHighField.getText()));
     		dataSet.setWeatherCondition(weatherConditionCombo.getValue());
     		dataSet.setImageQuality(imageQualityCombo.getValue());
-    		dataSet.setTimeOfTheDay(timeOfTheDayCombo.getValue());
-    		/**
-    		//Add images from dataset location to dataset
-    		if(!locationField.getText().equals("No Directory selected")) {
-	    		File dir = new File(locationField.getText());
-	    		File[] files = dir.listFiles();
-				for (File file: files) {
-					if(file.isFile()) {
-						String stringFile = file.toString();
-						String ext ="";
-						//var p is here because of filename with multiple "." 
-						//it takes last "."
-						int i = stringFile.lastIndexOf('.');
-						int p = Math.max(stringFile.lastIndexOf('/'), stringFile.lastIndexOf('\\'));
-						if (i>p) {
-							ext = stringFile.substring(i+1);
-							ext = ext.toLowerCase();
-						}
-						if(ext.equals("jpg") || ext.equals("jpeg") || ext.equals("png") || ext.equals("bmp")) {
-							DataImage image = new DataImage(file.getName(), file.getAbsolutePath());
-							//UNAPRIJEDITI SRUSI SE ZA VELIK BROJ SLIKA
-							if(!dataSet.containsImage(image.getImagePath())) {
-								dataSet.addDataSetImage(image);
-							}
-						}
-					}
-				}
-    		}
-			dataSet.setNumOfImgInDataSet();
-			*/
-    		
+    		dataSet.setTimeOfTheDay(timeOfTheDayCombo.getValue());	
     		okClicked = true;
     		dialogStage.close();
     	}
@@ -140,6 +144,7 @@ public class DataSetEditDialogController {
     
     /**
      * Method which is called when user clicks cancel.
+     * Close dialog window
      */
     @FXML
     private void handleCancel() {

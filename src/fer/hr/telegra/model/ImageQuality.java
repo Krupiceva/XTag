@@ -1,5 +1,11 @@
 package fer.hr.telegra.model;
 
+/**
+ * Enum class for image quality
+ * This is annotation of whole dataset
+ * @author dmlinaric
+ *
+ */
 public enum ImageQuality {
 	Unknown, Blurry, Sharp, Mix;
 	

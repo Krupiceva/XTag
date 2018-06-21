@@ -1,8 +1,11 @@
 car
+mini van
 van
-truck
+lcv
 bus
-trailer
-pickup
+truck
+articulated truck
+truck+trailer
+person
+motorcyle
 unknown
-

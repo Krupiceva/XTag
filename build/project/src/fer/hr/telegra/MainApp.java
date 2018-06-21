@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.prefs.Preferences;
 
 import javax.xml.bind.JAXBContext;
@@ -17,6 +16,7 @@ import javax.xml.bind.Unmarshaller;
 
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.DataSetListWrapper;
+import fer.hr.telegra.model.PathData;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
 import fer.hr.telegra.view.AnnotateDialogController;
@@ -51,26 +51,29 @@ public class MainApp extends Application {
 	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
-	private final String appVersion = "XTag v2.0.0 ";
+	private final String appVersion = "XTag v2.0.1 ";
 	
-	//Lists of datasets
+	//Instance of singleton class with last path used in application 
+	PathData pathData = PathData.getInstance();
+	
+	//Lists of datasets stored in application
 	private ObservableList<DataSet> dataSets = FXCollections.observableArrayList();
 	
 	//List of annotations 
 	private ObservableList<String> annotations = FXCollections.observableArrayList();
 	
-	//List of collors 
+	//List of colors 
 	HashMap<String, ObjectProperty<Color>> collors = new HashMap<String, ObjectProperty<Color>>();
-	
 	private ObservableList<String> colors = FXCollections.observableArrayList();
 	
-	//Map of colors of annotations
+	//Maps of colors of annotations
 	HashMap<String, ObjectProperty<Color>> colorsOfClasses = new HashMap<String, ObjectProperty<Color>>();
 	HashMap<String, ObjectProperty<Color>> colorsOfFlags = new HashMap<String, ObjectProperty<Color>>();
 	public StringProperty defaultClass = new SimpleStringProperty("unknown");
 	public Color defaultColor = Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.2);
 	public Color defaultBorderColor = Color.WHITE;
 	
+	//instance of controller class where most of logic is
 	public OpenDataSetOverviewController openController;
 	
 	public MainApp() { 
@@ -80,6 +83,7 @@ public class MainApp extends Application {
 		colorsOfFlags.put("Overlap&Truncated", new SimpleObjectProperty<Color>(Color.RED));
 	}
 	
+	//getters and setters
 	public ObservableList<DataSet> getDataSets() {
         return dataSets;
     }
@@ -132,6 +136,9 @@ public class MainApp extends Application {
 		defaultBorderColor = color;
 	}
 	
+	/**
+	 * Main method in JavaFX application, primaryStage is main stage displayed in window
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		
@@ -139,10 +146,10 @@ public class MainApp extends Application {
 		this.primaryStage.setTitle(appVersion);
 		Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
 		this.primaryStage.getIcons().add(appIcon);
-		//this.primaryStage.initStyle(StageStyle.UNDECORATED);
 		
 		initAnnotations();
 		initRootLayout();
+		//Show first scene in primaryStage
 		showDataSetsOverview();
 		
 	}
@@ -157,10 +164,7 @@ public class MainApp extends Application {
 			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
 			rootLayout = (BorderPane) loader.load();
 			
-			 // Show the scene containing the root layout.
-			//TODO prepravit custom decorator i da bi implementirao svoj izgled prozora i funkcionalnosti
-			//primaryStage.initStyle(StageStyle.UNDECORATED);
-			//Scene scene = new Scene(new CustomDecorator(primaryStage, rootLayout));
+			// Show the scene containing the root layout.
 			Scene scene = new Scene(rootLayout);
 			primaryStage.setScene(scene);
 			primaryStage.setMaximized(true);
@@ -178,7 +182,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 		
-		
+		//Load datasets from simple xml database
 	    File file = new File("data/database.xml");
 	    file.exists();
 	    if (file != null) {
@@ -212,6 +216,10 @@ public class MainApp extends Application {
 		}
 	}
 	
+	/**
+	 * Show selected dataset inside the root layout
+	 * @param dataSet is selected dataset from table in dataset overview
+	 */
 	public void showOpenDataSetOverview(DataSet dataSet) {
 		try {
 			//Load opendatasetoverview from xml file.
@@ -222,7 +230,7 @@ public class MainApp extends Application {
 			//Set overview into center of root lyout
 			rootLayout.setCenter(openDataSetOverview);
 			
-			//Give the controller acces to the main app
+			//Give the controller acces to the main app and dataset
 			openController = loader.getController();
 			openController.setMainApp(this);
 			openController.setDataSet(dataSet);
@@ -236,7 +244,6 @@ public class MainApp extends Application {
 	
 	/**
 	 * Opens dialog to edit details of dataset. If user clicks ok, the new changes are saved into provided dataset
-	 * 
 	 * @param dataSet is the dataset to be edited
 	 * @return true if user clicks ok, false otherwise
 	 */
@@ -272,6 +279,11 @@ public class MainApp extends Application {
 		}
 	}
 	
+	/**
+	 * Opens dialog to add new datset. If user clicks ok, the new dataset is stored in database
+	 * @param dataSet is new datset
+	 * @return true if user clicks ok, false otherwise
+	 */
 	public boolean showDataSetAddDialog (DataSet dataSet) {
 		try {
 			//Load fxml file
@@ -304,6 +316,13 @@ public class MainApp extends Application {
 		}
 	}
 	
+	/**
+	 * Open dialog for annotate new object, if user click ok it added this annotation to the corresponding image
+	 * @param imageGroup is group that contains main image and other annotations rectangle
+	 * @param rectangle is bounding box of corresponding annotation
+	 * @param index is index of that rectangle in imageGroup
+	 * @return wrapper around that rectangle containing rectangle and other information that are stored in this annotation
+	 */
 	public ResizableRectangleWrapper showAnnotateDialog (Group imageGroup, ResizableRectangle rectangle, Integer index) {
 		try{
 			//Load fxml file
@@ -321,7 +340,7 @@ public class MainApp extends Application {
 	        Scene scene = new Scene(page);
 	        dialogStage.setScene(scene);
 	        
-	        
+	        //set parameters 
 	        AnnotateDialogController controller = loader.getController();
 	        controller.setDialogStage(dialogStage);
 	        controller.setMainApp(this);
@@ -337,7 +356,13 @@ public class MainApp extends Application {
 			return null;
 		}
 	}
-	
+	/**
+	 * Open dialog for edit corresponding annotation, if user click ok the new information are stored in this annotation
+	 * @param rectangle is bounding box of corresponding annotation
+	 * @param index is index of that rectangle in imageGroup
+	 * @param annotations are list of annotations that current image have
+	 * @return true if user click ok, false otherwise
+	 */
 	public boolean showEditAnnotationDialog (ResizableRectangleWrapper rectangle, Integer index, ObservableList<ResizableRectangleWrapper> annotations) {
 		try{
 			//Load fxml file
@@ -355,16 +380,13 @@ public class MainApp extends Application {
 	        Scene scene = new Scene(page);
 	        dialogStage.setScene(scene);
 	        
-	        
+	        //Set parameters
 	        EditAnnotationDialogController controller = loader.getController();
 	        controller.setDialogStage(dialogStage);
 	        controller.setMainApp(this);
 	        controller.setRectangle(rectangle);
 	        controller.setIndex(index);
 	        controller.setAnnotation(annotations);
-	        
-	        //dialogStage.setX(rectangle.getXMax());
-	        //dialogStage.setY(rectangle.getYMax());
 	        
 	        dialogStage.showAndWait();
 	        return controller.isOkClicked();
@@ -375,7 +397,10 @@ public class MainApp extends Application {
 		}
 	}
 	
-	
+	/**
+	 * Open new dialog for export frames (images) from video, user can determined number of frames, each n frame will be exported from video,
+	 * prefix name of images and location where stored this frames
+	 */
 	public void showExportFramesDialog () {
 		try {
 			
@@ -392,6 +417,7 @@ public class MainApp extends Application {
 	        Scene scene = new Scene(page);
 	        dialogStage.setScene(scene);
 	        
+	        //Give controller access to mainApp
 	        ExportFramesDialogController controller = loader.getController();
 	        controller.setMainApp(this);
 	        controller.setDialogStage(dialogStage);
@@ -402,7 +428,16 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * Open new dialog where user can configure options of annotations:
+	 * color fill of every annotation class
+	 * default color fill for every annotation class
+	 * border color for every annotation class
+	 * border color for flags
+	 * add new annotation class
+	 * rearrange order of annotations
+	 * make corresponding annotation class default
+	 */
 	public void showConfigAnnotations () {
 		try {
 			
@@ -419,6 +454,7 @@ public class MainApp extends Application {
 	        Scene scene = new Scene(page);
 	        dialogStage.setScene(scene);
 	        
+	        //Give controller access to mainApp
 	        ConfigAnnotationsController controller = loader.getController();
 	        controller.setMainApp(this);
 	        controller.setDialogStage(dialogStage);
@@ -431,7 +467,13 @@ public class MainApp extends Application {
 	}
 	
 	/**
-	 * Method which read annotations from config file and add it to list of available annotations
+	 * Method which init:
+	 * annotations
+	 * annotations fill colors
+	 * annotations default class, color fill and vorder color
+	 * flags color
+	 * colors
+	 * last path used in application
 	 */
 	public void initAnnotations() {
 		try {
@@ -443,10 +485,6 @@ public class MainApp extends Application {
 		        annotations.add(line);
 		    }
 			reader.close();
-//			for (String annotation: annotations) {
-//				colorsOfClasses.put(annotation, Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.2));
-//			}
-			
 			file = new File("config/annotations_colors.txt");
 			res = new FileInputStream(file);
 			reader = new BufferedReader(new InputStreamReader(res));
@@ -495,6 +533,14 @@ public class MainApp extends Application {
 		    }
 			reader.close();
 				
+			file = new File("config/path_data.txt");
+			res = new FileInputStream(file);
+			reader = new BufferedReader(new InputStreamReader(res));
+			line = null;
+			while((line = reader.readLine()) != null) {
+				pathData.path = line;
+			}
+			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -510,7 +556,6 @@ public class MainApp extends Application {
     }
 
 	public static void main(String[] args) {
-		//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		launch(args);
 	}
 	
@@ -578,6 +623,7 @@ public class MainApp extends Application {
 	}
 	
 
+	//Not used because of windows bug
 	/**
 	 * Returns file preferences.
 	 * The preferences is read from OS specific registry. 

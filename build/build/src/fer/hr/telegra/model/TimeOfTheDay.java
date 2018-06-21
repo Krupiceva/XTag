@@ -1,5 +1,10 @@
 package fer.hr.telegra.model;
-
+/**
+ * Enum class for time of the day in dataset
+ * This is annotation of whole dataset
+ * @author dmlinaric
+ *
+ */
 public enum TimeOfTheDay {
 	Unknown, Day, Night, Mix;
 	

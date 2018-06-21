@@ -9,9 +9,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Bounds;
-
+/**
+ * Wrapper class around resizable rectangle which represent whole annotation with all informations
+ * @author dmlinaric
+ *
+ */
 public class ResizableRectangleWrapper {
-
 	private ResizableRectangle rectangle;
 	private StringProperty klass;
 	private StringProperty color;
@@ -27,9 +30,12 @@ public class ResizableRectangleWrapper {
 	private IntegerProperty index;
 	
 	public ResizableRectangleWrapper() {
-		
 	}
-	
+	/**
+	 * Constructor
+	 * @param rectangle is rectangle to wrap
+	 * @param index is index of that rectangle in group on scene
+	 */
 	public ResizableRectangleWrapper(ResizableRectangle rectangle, Integer index) {
 		this.rectangle = rectangle;
 		this.index = new SimpleIntegerProperty(index);
@@ -37,7 +43,7 @@ public class ResizableRectangleWrapper {
 		IntegerProperty widthProp = new SimpleIntegerProperty(0);
 		IntegerProperty heightProp = new SimpleIntegerProperty(0);
 		this.klass = new SimpleStringProperty("");
-		this.color = new SimpleStringProperty("");
+		this.color = new SimpleStringProperty("Unknown");
 		this.additionalText = new SimpleStringProperty("");
 		this.isTruncated = new SimpleBooleanProperty(false);
 		this.isDifficult = new SimpleBooleanProperty(false);
@@ -46,6 +52,7 @@ public class ResizableRectangleWrapper {
 		this.yMin = new SimpleIntegerProperty((int) bounds.getMinY());
 		this.xMax = new SimpleIntegerProperty((int) bounds.getMaxX());
 		this.yMax = new SimpleIntegerProperty((int) bounds.getMaxY());
+		//Make new properties for xmax and ymax with xmin, ymin, width and height
 		xMin.bind(rectangle.xProperty());
 		yMin.bind(rectangle.yProperty());
 		widthProp.bind(rectangle.widthProperty());
@@ -53,11 +60,17 @@ public class ResizableRectangleWrapper {
 		xMax.bind(rectangle.xProperty().add(widthProp));
 		yMax.bind(rectangle.yProperty().add(heightProp));
 		this.aspectRatio = new SimpleDoubleProperty(this.rectangle.getAspectRatio());
-		
 	}
 	
+	/**
+	 * Getters and setters for all attributes
+	 */
 	public ResizableRectangle getRectangle() {
 		return rectangle;
+	}
+	
+	public void setRectangle(ResizableRectangle rectangle) {
+		this.rectangle = rectangle;
 	}
 	
 	public String getKlass() {

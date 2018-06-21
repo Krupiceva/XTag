@@ -12,7 +12,13 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-
+/**
+ * Model class for bounding box around annotation
+ * It can be resized and moved in scene
+ * aspect ratio can be set and fixed
+ * @author dmlinaric
+ *
+ */
 public class ResizableRectangle extends Rectangle {
 
 	private double rectangleStartX;
@@ -22,13 +28,11 @@ public class ResizableRectangle extends Rectangle {
     private double aspectRatio;
     private static final double RESIZER_SQUARE_SIDE = 4;
     private Paint resizerSquareColor = Color.WHITE;
-    private Paint rectangleStrokeColor = Color.WHITE;
     private ImageView imageView;
     private MainApp mainApp;
 
     public ResizableRectangle(double x, double y, double width, double height, double aspectRatio, Group group, ObservableList<ResizableRectangleWrapper> annotations, TableView<ResizableRectangleWrapper> annotationsTable, ImageView imageView, MainApp mainApp) {
     	super(x,y,width,height);
-    	//super.widthProperty().bindBidirectional(super.heightProperty());
         this.imageView = imageView;
         this.aspectRatio = aspectRatio;
         this.mainApp = mainApp;
@@ -38,7 +42,10 @@ public class ResizableRectangle extends Rectangle {
         super.setStrokeType(StrokeType.INSIDE);
         super.setFill(mainApp.getDefaultColor());
 
-
+        /**
+         * Invisible rectangle that is the same like corresponding rectangle (this)
+         * It is bind with this rectangle and it is used for event handling
+         */
         Rectangle moveRect = new Rectangle(0,0,0,0);
         moveRect.setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0));
         moveRect.xProperty().bind(super.xProperty());
@@ -50,7 +57,6 @@ public class ResizableRectangle extends Rectangle {
 
         moveRect.addEventHandler(MouseEvent.MOUSE_ENTERED, event ->{
             moveRect.getParent().setCursor(Cursor.HAND);
-        	//super.setFill(Color.LIGHTPINK.deriveColor(0, 1.2, 1, 0.6));
         });
 
         moveRect.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -60,7 +66,10 @@ public class ResizableRectangle extends Rectangle {
             moveRect.getParent().setCursor(Cursor.MOVE);
             mouseClickPozX = event.getX();
             mouseClickPozY = event.getY();
-           
+            
+            /**
+             * select rectangle on which is mouse clicked (change the color and select corresponding rectangle in table with all annotations)
+             */
             for(ResizableRectangleWrapper rectWrap: annotations) {
     			int xmin = rectWrap.getXMin();
     			int xmax = rectWrap.getXMax();
@@ -72,16 +81,14 @@ public class ResizableRectangle extends Rectangle {
     			if(curx > xmin && curx < xmax && cury > ymin && cury < ymax) {
     				rectWrap.getRectangle().setFill(Color.WHITE.deriveColor(0, 1.2, 1, 0.2));;
     				annotationsTable.getSelectionModel().select(rectWrap);
-    				/**
-    				editButton.setDisable(false);
-    	        	deleteButton.setDisable(false);
-    	        	
-    	        	*/
     			}
     		}
+            /**
+             * On double click open edit dialog for this annotation rectangle
+             */
             if(event.getClickCount() == 2) {
             	ResizableRectangleWrapper rect = annotationsTable.getSelectionModel().getSelectedItem();
-            	
+            	//First reduce number of this annotation class
             	if(mainApp.openController.getDataSet().getAnnotations().containsKey(rect.getKlass())) {
     				int num = mainApp.openController.getDataSet().getAnnotations().get(rect.getKlass());
     				num = num - 1;
@@ -95,7 +102,7 @@ public class ResizableRectangle extends Rectangle {
             	
             	mainApp.showEditAnnotationDialog(rect, rect.getIndex(), annotations);
             	
-            	
+            	//Refresh border color of this annotation
         		boolean overlap = rect.getOverlap();
         		boolean truncated = rect.getTruncated();
         		boolean difficult = rect.getDifficult();
@@ -115,6 +122,7 @@ public class ResizableRectangle extends Rectangle {
         			rect.getRectangle().setStroke(mainApp.getDefaultBorderColor());
         		}
         		
+        		//In the end increase number of this annotation class
         		if(mainApp.openController.getDataSet().getAnnotations().containsKey(rect.getKlass())) {
     				int num = mainApp.openController.getDataSet().getAnnotations().get(rect.getKlass());
     				num = num + 1;
@@ -126,8 +134,6 @@ public class ResizableRectangle extends Rectangle {
         		
         		mainApp.openController.handleSaveButton();
             }
-            //System.out.println(event.getPickResult());
-
         });
 
         moveRect.addEventHandler(MouseEvent.MOUSE_RELEASED, event ->{
@@ -136,7 +142,6 @@ public class ResizableRectangle extends Rectangle {
         });
         moveRect.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
                 moveRect.getParent().setCursor(Cursor.DEFAULT);
-                //super.setFill(Color.LIGHTBLUE.deriveColor(0, 1.2, 1, 0.6));
         });
 
         moveRect.addEventHandler(MouseEvent.MOUSE_DRAGGED,event -> {
@@ -172,7 +177,10 @@ public class ResizableRectangle extends Rectangle {
 
 
     }
-
+    /**
+     * Methods for making 8 small rectangles for resizing the main rectangle
+     * @param group
+     */
     private void makeNWResizerSquare(Group group) {
         Rectangle squareNW = new Rectangle(RESIZER_SQUARE_SIDE,RESIZER_SQUARE_SIDE);
 

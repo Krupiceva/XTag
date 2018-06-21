@@ -32,9 +32,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fer.hr.telegra.MainApp;
+import fer.hr.telegra.model.ChangeableHistory;
 import fer.hr.telegra.model.DataImage;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ImageQuality;
+import fer.hr.telegra.model.Operation;
+import fer.hr.telegra.model.OperationRectangleWrappers;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
 import fer.hr.telegra.model.TooltippedTableCell;
@@ -197,6 +200,7 @@ public class OpenDataSetOverviewController {
 	//ScrollPane scrollPane = new ScrollPane();
 	ScrollPane scroller = new ScrollPane();
 	
+	ChangeableHistory history = ChangeableHistory.getInstance();
 	Image image;
 	ToggleGroup toggleGroup = new ToggleGroup();;
 	ContextMenu contextMenu;
@@ -229,6 +233,7 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private void initialize() {
 		System.gc();
+		history.resetHistory();
 		splitPaneHor.setDividerPositions(0.15);
 		splitPaneHor.lookupAll(".split-pane-divider").stream().forEach(div -> div.setMouseTransparent(true));
 		
@@ -401,10 +406,16 @@ public class OpenDataSetOverviewController {
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 		KeyCombination cntrlS = new KeyCodeCombination(KeyCode.S, KeyCodeCombination.CONTROL_DOWN);
+		KeyCombination cntrlZ = new KeyCodeCombination(KeyCode.Z, KeyCodeCombination.CONTROL_DOWN);
+		KeyCombination cntrlY = new KeyCodeCombination(KeyCode.Y, KeyCodeCombination.CONTROL_DOWN);
 		this.mainApp.getPrimaryStage().getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-				if (event.getCode() == KeyCode.A || event.getCode() == KeyCode.LEFT) {
+				if(cntrlZ.match(event)) {
+					//handleUndo();
+				} else if (cntrlY.match(event)) {
+					//handleRedo();
+				} else if (event.getCode() == KeyCode.A || event.getCode() == KeyCode.LEFT) {
 					handlePrevious();
 				} else if (event.getCode() == KeyCode.D || event.getCode() == KeyCode.RIGHT) {
 					handleNext();
@@ -1017,6 +1028,9 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private void handleDeleteButton() {
 
+		history.currentIndex++;
+		history.operations.add(Operation.delete);
+		history.rectangles.add(new OperationRectangleWrappers(null, annotationsTable.getSelectionModel().getSelectedItem()));
 		updateAnnotations("Minus");
 		int i = annotationsTable.getSelectionModel().getSelectedItem().getIndex();
 		int j = i + (i - 1) * 9;
@@ -1034,7 +1048,6 @@ public class OpenDataSetOverviewController {
 		index = index - 1;
 		
 		updateAnnotationsNumber();
-		
 		handleSaveButton();
 	}
 
@@ -1756,6 +1769,10 @@ public class OpenDataSetOverviewController {
 						
 						handleSaveButton();
 						
+						history.currentIndex++;
+						history.operations.add(Operation.add);
+						history.rectangles.add(new OperationRectangleWrappers(annotation, null));
+						
 					} else {
 						index = index - 1;
 					}
@@ -1766,7 +1783,118 @@ public class OpenDataSetOverviewController {
 	}
 
 	
+	public void handleUndo() {
+		if (history.currentIndex > -1) {
+			if (history.operations.get(history.currentIndex) == Operation.add) {
+				ResizableRectangleWrapper rect = history.rectangles.get(history.currentIndex).getRectangleWrapperNew();
+				if (dataSet.getAnnotations().containsKey(rect.getKlass())) {
+					int num = dataSet.getAnnotations().get(rect.getKlass());
+					num = num - 1;
+					if (num == 0) {
+						dataSet.getAnnotations().remove(rect.getKlass());
+					} else {
+						dataSet.getAnnotations().put(rect.getKlass(), num);
+					}
+				}
+				int i = history.rectangles.get(history.currentIndex).getRectangleWrapperNew().getIndex();
+				int j = i + (i - 1) * 9;
+				imageGroup.getChildren().remove(j, j + 10);
+				annotations.remove(history.rectangles.get(history.currentIndex).getRectangleWrapperNew());
+				annotationsTable.getSelectionModel().clearSelection();
+				deleteButton.setDisable(true);
+				editButton.setDisable(true);
+				for (ResizableRectangleWrapper r : annotations) {
+					if (r.getIndex() > i) {
+						r.setIndex(r.getIndex() - 1);
+					}
+				}
+
+				updateAnnotationsNumber();
+				handleSaveButton();
+
+				history.currentIndex--;
+				index--;
+			} else if (history.operations.get(history.currentIndex) == Operation.delete) {
+
+			} 
+		}
+	}
+	
+	public void handleRedo() {
+		if (history.currentIndex < history.operations.size()-1 ) {
+			history.currentIndex++;
+			if (history.operations.get(history.currentIndex) == Operation.add) {
+				ResizableRectangleWrapper annotation = history.rectangles.get(history.currentIndex)
+						.getRectangleWrapperNew();
+				index = index + 1;
+				if (annotation != null) {
+					annotation.setRectangle(new ResizableRectangle(annotation.getRectangle().getX(),
+							annotation.getRectangle().getY(), annotation.getRectangle().getWidth(),
+							annotation.getRectangle().getHeight(), annotation.getAspectRatio(), imageGroup, annotations,
+							annotationsTable, imageView, mainApp));
+					if (annotations.isEmpty()) {
+						annotations.add(annotation);
+						annotationsTable.setItems(annotations);
+					} else {
+						annotations.add(annotation);
+					}
+					annotation.getRectangle().setFill(mainApp.getColorOfClasses().get(annotation.getKlass()).get());
+					boolean overlap = annotation.getOverlap();
+					boolean truncated = annotation.getTruncated();
+					boolean difficult = annotation.getDifficult();
+					if (overlap && truncated) {
+						annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap&Truncated").get());
+					} else if (overlap) {
+						annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Overlap").get());
+					} else if (truncated) {
+						annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Truncated").get());
+					} else if (difficult) {
+						annotation.getRectangle().setStroke(mainApp.getColorsOfFlags().get("Difficult").get());
+					} else if (overlap == false && truncated == false && difficult == false) {
+						annotation.getRectangle().setStroke(mainApp.getDefaultBorderColor());
+					}
+
+					if (dataSet.getAnnotations().containsKey(annotation.getKlass())) {
+						int num = dataSet.getAnnotations().get(annotation.getKlass());
+						num = num + 1;
+						dataSet.getAnnotations().put(annotation.getKlass(), num);
+					} else {
+						dataSet.getAnnotations().put(annotation.getKlass(), 1);
+					}
+
+					updateAnnotationsNumber();
+
+					handleSaveButton();
+
+				}
+			} 
+		}
+	}
+	
 	private void testPrint() {
-		
+		System.out.println(history.currentIndex);
+		for(OperationRectangleWrappers rect: history.rectangles) {
+			System.out.println("*************");
+			ResizableRectangleWrapper newRect = rect.getRectangleWrapperNew();
+			ResizableRectangleWrapper oldRect = rect.getRectangleWrapperOld();
+			if(newRect != null) {
+				System.out.println(newRect.getRectangle());
+			}
+			else {
+				System.out.println("null");
+			}
+			if(oldRect != null) {
+				System.out.println(oldRect.getRectangle());
+			}
+			else {
+				System.out.println("null");
+			}
+			System.out.println("*************");
+		}
+		for(Operation op: history.operations) {
+			System.out.println("--------------");
+			System.out.println(op);
+			System.out.println("--------------");
+		}
 	}
 }

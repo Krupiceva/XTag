@@ -2,7 +2,6 @@ package fer.hr.telegra.view;
 
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,41 +13,69 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-
+/**
+ * Controller class for editing selected annotation 
+ * @author dmlinaric
+ *
+ */
 public class EditAnnotationDialogController {
-
+	/**
+	 * Listview with all possible annotations class
+	 */
 	@FXML
     private ListView<String>  listOfAnnotations;
+	/**
+	 * Listview with all possible annotations color
+	 */
 	@FXML
 	private ListView<String> listOfColors;
+	/**
+	 * Textfield for possible additionalText, not mandatory
+	 */
 	@FXML
 	private TextField additionalText;
+	/**
+	 * Check box for is it or not this annotation difficult to see on image
+	 */
 	@FXML
 	private CheckBox difficult;
+	/**
+	 * Check box for is it or not this annotation truncated (when the object is not completely visible in the image) 
+	 */
 	@FXML
 	private CheckBox truncated;
+	/**
+	 * Check box for is it or not this annotation overlap with some other annotation
+	 */
 	@FXML
 	private CheckBox overlap;
+	/**
+	 * Stage of this dialog window
+	 */
 	private Stage dialogStage;
+	/**
+	 * Annotation to be edited
+	 */
 	private ResizableRectangleWrapper rectangleWrapper;
 	private boolean okClicked = false;
-    
+   
     public EditAnnotationDialogController() {}
 	
+    /**
+     * Initialize method is mandatory for JavaFX FXML layout 
+     */
     @FXML
     private void initialize() {
-    	
     }
     
     /**
      * Sets the stage of this dialog.
-     * 
-     * @param dialogStage
+     * Adding keyboard shortcuts to the scene of this stage
+     * @param dialogStage is stage to set
      */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
         this.dialogStage.setResizable(false);
-        //this.dialogStage.initStyle(StageStyle.UNDECORATED);
         this.dialogStage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -129,22 +156,27 @@ public class EditAnnotationDialogController {
                 }
                 else if (event.getCode() == KeyCode.ENTER) {
                 	handleOK();
-                }
-                
+                }       
             }
         });
     }
     
-    
+    /**
+     * Give access to the mainApp.
+     * Populate lists with data from mainApp
+     * @param mainApp
+     */
     public void setMainApp(MainApp mainApp) {
         listOfAnnotations.setEditable(true);
         listOfAnnotations.setItems(mainApp.getAnnotations());
-        //listOfAnnotations.setCellFactory(param -> new RadioListCell());
         listOfColors.setEditable(true);
         listOfColors.setItems(mainApp.getColors());
     }
     
-    
+    /**
+     * Put information of annotation on the screen
+     * @param rectangle is annotation that is selected to edit
+     */
     public void setRectangle(ResizableRectangleWrapper rectangle) {
     	this.rectangleWrapper = rectangle;
     	additionalText.setText(rectangleWrapper.getAdditionalText());
@@ -179,6 +211,9 @@ public class EditAnnotationDialogController {
     	dialogStage.close();
     }
     
+    /**
+     * Add all new information to the selected annotation
+     */
     @FXML
     private void handleOK() {
     	rectangleWrapper.setKlass(listOfAnnotations.getSelectionModel().getSelectedItem());

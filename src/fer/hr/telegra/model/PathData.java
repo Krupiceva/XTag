@@ -1,5 +1,9 @@
 package fer.hr.telegra.model;
-
+/**
+ * Singleton class with last path used in application
+ * @author dmlinaric
+ *
+ */
 public class PathData {
     private static PathData singleInstance = null;
  

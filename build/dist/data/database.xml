@@ -3,27 +3,39 @@
     <dataSet>
         <annotations>
             <entry>
-                <key>car</key>
-                <value>1</value>
+                <key>mini van</key>
+                <value>5</value>
             </entry>
             <entry>
-                <key>truck</key>
-                <value>1</value>
+                <key>car</key>
+                <value>16</value>
             </entry>
         </annotations>
         <cameraAngle>0.0</cameraAngle>
         <cameraHigh>0.0</cameraHigh>
-        <dataSetAnnotationsLocation>sample/annotations</dataSetAnnotationsLocation>
-        <dataSetImagesLocation>sample/images</dataSetImagesLocation>
+        <dataSetAnnotationsLocation>sample\annotations</dataSetAnnotationsLocation>
+        <dataSetImages>
+            <imageName>dwg_cam01_v1_12.jpg</imageName>
+        </dataSetImages>
+        <dataSetImages>
+            <imageName>dwg_cam01_v1_7.jpg</imageName>
+        </dataSetImages>
+        <dataSetImages>
+            <imageName>dwg_cam01_v1_8.jpg</imageName>
+        </dataSetImages>
+        <dataSetImages>
+            <imageName>dwg_cam01_v1_9.jpg</imageName>
+        </dataSetImages>
+        <dataSetImagesLocation>sample\images</dataSetImagesLocation>
         <dataSetImagesWithAnnotations>
-            <imageName>car.jpg</imageName>
+            <imageName>dwg_cam01_v1_10.jpg</imageName>
         </dataSetImagesWithAnnotations>
         <dataSetImagesWithAnnotations>
-            <imageName>truck.jpg</imageName>
+            <imageName>dwg_cam01_v1_11.jpg</imageName>
         </dataSetImagesWithAnnotations>
-        <dataSetName>Test set</dataSetName>
-        <imageQuality>Unknown</imageQuality>
-        <timeOfTheDay>Unknown</timeOfTheDay>
-        <weatherCondition>Unknown</weatherCondition>
+        <dataSetName>Test_set_DWG</dataSetName>
+        <imageQuality>Sharp</imageQuality>
+        <timeOfTheDay>Day</timeOfTheDay>
+        <weatherCondition>Sunny</weatherCondition>
     </dataSet>
 </dataSets>

@@ -23,7 +23,7 @@ DefaultGroupName=fer.hr.telegra
 LicenseFile=
 ;WinXP or above
 MinVersion=0,5.1 
-OutputBaseFilename=XTag-2.0.0
+OutputBaseFilename=XTag-2.0.1
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest

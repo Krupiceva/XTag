@@ -271,13 +271,25 @@ public class OpenDataSetOverviewController {
 		
 		// Add listener for which image need to be display in imageview
 		listOfImg.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			System.out.println("newvalue: " + newValue);
 			if (newValue != null) {
-				listOfImgWithAnnotations.getSelectionModel().select(-1);
-				listOfVerImg.getSelectionModel().select(-1);
-				showImage(newValue);
+				if(oldValue != null) {
+					if(!oldValue.equals(newValue)) {
+						listOfImgWithAnnotations.getSelectionModel().select(-1);
+						listOfVerImg.getSelectionModel().select(-1);
+						showImage(newValue);
+					}
+				}
+				else {
+					listOfImgWithAnnotations.getSelectionModel().select(-1);
+					listOfVerImg.getSelectionModel().select(-1);
+					showImage(newValue);
+				}
+				
 			}
 			else {
 				if(imgs.isEmpty()) {
+					System.out.println("tu sam uso");
 					listOfImgWithAnnotations.getSelectionModel().select(imgsWithAnnotations.size()-1);
 					listOfImgWithAnnotations.getFocusModel()
 					.focus(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
@@ -412,9 +424,9 @@ public class OpenDataSetOverviewController {
 			@Override
 			public void handle(KeyEvent event) {
 				if(cntrlZ.match(event)) {
-					handleUndo();
+					//handleUndo();
 				} else if (cntrlY.match(event)) {
-					handleRedo();
+					//handleRedo();
 				} else if (event.getCode() == KeyCode.A || event.getCode() == KeyCode.LEFT) {
 					handlePrevious();
 				} else if (event.getCode() == KeyCode.D || event.getCode() == KeyCode.RIGHT) {
@@ -1418,7 +1430,10 @@ public class OpenDataSetOverviewController {
 			listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
 		} else if (listOfImgWithAnnotations.getSelectionModel().getSelectedItem() != null) {
 			if(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex() == (imgsWithAnnotations.size()-1)) {
-				listOfImg.getSelectionModel().select(0);
+				System.out.println("babaroga");
+				if(listOfImg.getSelectionModel().getSelectedIndex() != 0) {
+					listOfImg.getSelectionModel().select(0);
+				}
 				listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
 				listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
 				return;
@@ -1541,7 +1556,7 @@ public class OpenDataSetOverviewController {
 	public void clearSelection(Group group) {
 		if (group.getChildren().size() > 1) {
 			// deletes everything except for base container layer
-			System.out.println(group.getChildren().size());
+			//System.out.println(group.getChildren().size());
 			group.getChildren().remove(1, group.getChildren().size());
 			index = 0;
 		}

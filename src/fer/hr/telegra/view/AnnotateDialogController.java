@@ -1,62 +1,82 @@
 package fer.hr.telegra.view;
 
-import java.io.IOException;
-
 import fer.hr.telegra.MainApp;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
+/**
+ * Controller class for annotating the object in image
+ * @author dmlinaric
+ *
+ */
 public class AnnotateDialogController {
+	/**
+	 * Listview with all possible annotations class
+	 */
 	@FXML
     private ListView<String>  listOfAnnotations;
+	/**
+	 * Listview with all possible annotations color
+	 */
 	@FXML
 	private ListView<String> listOfCollors;
-	@FXML
-	private Slider overlapSlider;
-	@FXML
-	private Slider truncationSlider;
-	@FXML
-	private TextField overlapField;
-	@FXML
-	private TextField truncationField;
+	/**
+	 * Textfield for possible additionalText, not mandatory
+	 */
 	@FXML
 	private TextField additionalText;
+	/**
+	 * Check box for is it or not this annotation difficult to see on image
+	 */
 	@FXML
 	private CheckBox difficult;
+	/**
+	 * Check box for is it or not this annotation truncated (when the object is not completely visible in the image)
+	 */
 	@FXML
 	private CheckBox truncated;
+	/**
+	 * Check box for is it or not this annotation overlap with some other annotation
+	 */
 	@FXML
 	private CheckBox overlap;
+	/**
+	 * Stage of this dialog windows
+	 */
 	private Stage dialogStage;
+	/**
+	 * reference to mainApp
+	 */
 	private MainApp mainApp;
+	/**
+	 * Reference to group with image and other annotations
+	 */
 	private Group imageGroup;
+	/**
+	 * Reference to bounding box around annotation
+	 */
 	private ResizableRectangle rectangle;
+	/**
+	 * Wrapper around rectangle with all information needed to be whole annotation
+	 */
 	private ResizableRectangleWrapper rectangleWrapper;
+	/**
+	 * Index of annotation rectangle in group
+	 */
 	private Integer index;
     private boolean okClicked = false;
-    public static final ObservableList<RadioButton> namesRadioButtons = FXCollections.observableArrayList();
     
 	public AnnotateDialogController() {
 	}
@@ -101,13 +121,13 @@ public class AnnotateDialogController {
 	
 	/**
      * Sets the stage of this dialog.
-     * 
-     * @param dialogStage
+     * Adding keyboard shortcuts to the scene of this stage
+     * @param dialogStage is stage to set
      */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
         this.dialogStage.setResizable(false);
-        //this.dialogStage.initStyle(StageStyle.UNDECORATED);
+        //If dialog is closed, remove this new potential annotation rectangle from group
         this.dialogStage.setOnCloseRequest(event -> {
         	imageGroup.getChildren().remove(imageGroup.getChildren().size() - 10, imageGroup.getChildren().size());
         });
@@ -199,6 +219,11 @@ public class AnnotateDialogController {
     public void setDataSet (DataSet dataSet) {
     }
     
+    /**
+     * Give access to the mainApp.
+     * Populate lists with data from mainApp
+     * @param mainApp
+     */
     public void setMainApp(MainApp mainApp) {
     	this.mainApp = mainApp;
         listOfAnnotations.setEditable(true);
@@ -238,10 +263,14 @@ public class AnnotateDialogController {
     @FXML
     private void handleCancel() {
     	dialogStage.close();
+    	//remove this new potential annotation rectangle from group
     	imageGroup.getChildren().remove(imageGroup.getChildren().size() - 10, imageGroup.getChildren().size());
     	
     }
     
+    /**
+     * Add all information to the new annotation
+     */
     @FXML
     private void handleOK() {
     	rectangleWrapper = new ResizableRectangleWrapper(rectangle, index);
@@ -264,6 +293,9 @@ public class AnnotateDialogController {
     	
     }
     
+    /**
+     * Helper methods for color manipulation, not used in current version
+     */
     public static Color getContrastColor(java.awt.Color color) {
     	  double y = (299 * color.getRed() + 587 * color.getGreen() + 114 * color.getBlue()) / 1000;
     	  return y >= 128 ? Color.BLACK : Color.WHITE;
