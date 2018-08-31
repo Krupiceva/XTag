@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane maxHeight="450.0" maxWidth="400.0" minHeight="450.0" minWidth="400.0" prefHeight="450.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fer.hr.telegra.view.DataSetAddFromNVRDialogController">
+   <children>
+      <GridPane layoutX="117.0" layoutY="105.0" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Label text="Name" />
+            <Label text="Camera Angle" GridPane.rowIndex="1" />
+            <Label text="Weather Condition" GridPane.rowIndex="4" />
+            <Label text="Camera High" GridPane.rowIndex="2" />
+            <Label text="Image Quality" GridPane.rowIndex="5" />
+            <Label text="Annotations location" GridPane.rowIndex="7" />
+            <TextField fx:id="nameField" GridPane.columnIndex="1" />
+            <TextField fx:id="cameraAngleField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="cameraHighField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ComboBox fx:id="weatherConditionCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ComboBox fx:id="imageQualityCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Label text="Images location" GridPane.rowIndex="6" />
+            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="128.0" minWidth="10.0" prefWidth="122.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="73.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <TextField fx:id="imagesLocationField" />
+                  <Button mnemonicParsing="false" onAction="#handleBrowse" text="Browse..." GridPane.columnIndex="1" />
+               </children>
+            </GridPane>
+            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="7">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="122.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="93.0" minWidth="10.0" prefWidth="73.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <TextField fx:id="annotationsLocationField" />
+                  <Button mnemonicParsing="false" onAction="#handleBrowse1" text="Browse..." GridPane.columnIndex="1" />
+               </children>
+            </GridPane>
+            <Label text="Time of the day" GridPane.rowIndex="3" />
+            <ComboBox fx:id="timeOfTheDayCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         </children>
+      </GridPane>
+      <TableView fx:id="streamTable" layoutX="75.0" layoutY="213.0" prefHeight="450.0" prefWidth="400.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="250.0">
+        <columns>
+          <TableColumn fx:id="streamAddress" prefWidth="75.0" text="Stream" />
+          <TableColumn fx:id="streamStart" prefWidth="75.0" text="Start" />
+            <TableColumn fx:id="streamEnd" prefWidth="75.0" text="End" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <ButtonBar layoutX="178.0" layoutY="416.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="420.0">
+        <buttons>
+          <Button mnemonicParsing="false" onAction="#handleImport" text="Import" />
+            <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+        </buttons>
+      </ButtonBar>
+      <Button layoutX="14.0" layoutY="213.0" mnemonicParsing="false" onAction="#handleAddNewStream" text="Add New Stream..." AnchorPane.bottomAnchor="212.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="213.0" />
+   </children>
+</AnchorPane>

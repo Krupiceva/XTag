@@ -366,12 +366,13 @@ public class DataSetsOverviewController {
     @FXML
     private void handleNewDataSet() {
     	DataSet tempDataSet = new DataSet();
-    	boolean okClicked = mainApp.showDataSetAddDialog(tempDataSet);
-    	if(okClicked) {
-    		mainApp.getDataSets().add(tempDataSet);
-    		File file = MainApp.getLastFilePath();
-            mainApp.saveDataSetsToFile(file);
-    	}
+//    	boolean okClicked = mainApp.showDataSetAddDialog(tempDataSet);
+//    	if(okClicked) {
+//    		mainApp.getDataSets().add(tempDataSet);
+//    		File file = MainApp.getLastFilePath();
+//            mainApp.saveDataSetsToFile(file);
+//    	}
+    	mainApp.showChooseDataSetAddDialog(tempDataSet);
     }
     
     /**

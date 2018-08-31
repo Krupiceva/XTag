@@ -19,9 +19,12 @@ import fer.hr.telegra.model.DataSetListWrapper;
 import fer.hr.telegra.model.PathData;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
+import fer.hr.telegra.view.AddNewStreamDialogController;
 import fer.hr.telegra.view.AnnotateDialogController;
+import fer.hr.telegra.view.ChooseDataSetAddDialogController;
 import fer.hr.telegra.view.ConfigAnnotationsController;
 import fer.hr.telegra.view.DataSetAddDialogController;
+import fer.hr.telegra.view.DataSetAddFromNVRDialogController;
 import fer.hr.telegra.view.DataSetEditDialogController;
 import fer.hr.telegra.view.DataSetsOverviewController;
 import fer.hr.telegra.view.EditAnnotationDialogController;
@@ -51,7 +54,7 @@ public class MainApp extends Application {
 	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
-	private final String appVersion = "XTag v2.0.1 ";
+	private final String appVersion = "XTag v3.0.0 ";
 	
 	//Instance of singleton class with last path used in application 
 	PathData pathData = PathData.getInstance();
@@ -280,7 +283,7 @@ public class MainApp extends Application {
 	}
 	
 	/**
-	 * Opens dialog to add new datset. If user clicks ok, the new dataset is stored in database
+	 * Opens dialog to add new datset from disk. If user clicks ok, the new dataset is stored in database
 	 * @param dataSet is new datset
 	 * @return true if user clicks ok, false otherwise
 	 */
@@ -313,6 +316,119 @@ public class MainApp extends Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+	
+	/**
+	 * Opens dialog to add new dataset from NVR. When user click import new dataset without images is import
+	 * When user open this dataset it fetch first image from NVR
+	 * @param dataSet is new dataset
+	 * @return true if user clicks import, false otherwise 
+	 */
+	public boolean showDataSetAddFromNVRDialog (DataSet dataSet) {
+		try {
+			//Load fxml file
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/DataSetAddFromNVRDialog.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+			
+			//Create new dialog stage
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Add Dataset");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        dialogStage.initOwner(primaryStage);
+	        Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
+	        dialogStage.getIcons().add(appIcon);
+	        Scene scene = new Scene(page);
+	        dialogStage.setScene(scene);
+	        
+	        //Set the dataset into controller
+	        DataSetAddFromNVRDialogController controller = loader.getController();
+	        controller.setDialogStage(dialogStage);
+	        controller.setDataSet(dataSet);
+	        controller.setMainApp(this);
+	        
+	        //Show dialog and wait for user
+	        dialogStage.showAndWait();
+	        
+	        return controller.isOkClicked();	        
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Show small dialog for user to choose if he wants to import dataset from disk or NVR
+	 * @param dataSet is new dataset
+	 */
+	public void showChooseDataSetAddDialog (DataSet dataSet) {
+		try {
+			//Load fxml file
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ChooseDataSetAddDialog.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+			
+			//Create new dialog stage
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Add DataSet from:");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        dialogStage.initOwner(primaryStage);
+	        Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
+	        dialogStage.getIcons().add(appIcon);
+	        Scene scene = new Scene(page);
+	        dialogStage.setScene(scene);
+	        
+	        //Set the dataset into controller
+	        ChooseDataSetAddDialogController controller = loader.getController();
+	        controller.setMainApp(this);
+	        controller.setDialogStage(dialogStage);
+	        controller.setDataSet(dataSet);
+	        
+	        //Show dialog and wait for user
+	        dialogStage.showAndWait();
+	        
+	        //return controller.isOkClicked();	        
+		} catch (IOException e) {
+			e.printStackTrace();
+			//return false;
+		}
+	}
+	
+	/**
+	 * Show dialog in which user can define new stream for dataset
+	 * @return string that contains information about new stream
+	 * format: "txvn://172.17.101.88:9801/600305;20180601T003317;20180601T063317"
+	 */
+	public String showAddNewStreamDialog () {
+		try {
+			//Load fxml file
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/AddNewStreamDialog.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+			
+			//Create new dialog stage
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Add DataSet from:");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        dialogStage.initOwner(primaryStage);
+	        Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
+	        dialogStage.getIcons().add(appIcon);
+	        Scene scene = new Scene(page);
+	        dialogStage.setScene(scene);
+	        
+	        //Set the dataset into controller
+	        AddNewStreamDialogController controller = loader.getController();
+	        controller.setDialogStage(dialogStage);
+	        
+	        //Show dialog and wait for user
+	        dialogStage.showAndWait();
+	        return controller.isOk();
+	        
+	        //return controller.isOkClicked();	        
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 	
