@@ -50,7 +50,13 @@ public class DataSet {
      */
     private ObservableMap<String, Integer> annotations = FXCollections.observableHashMap();
     
-	
+    /**
+     * The list of all streams with this dataset
+     * If it is empty then dataset is added from disk, and can't fetching new images from NVR
+     * If it is not empty, then application could fetch new images from NVR and adding them to the dataset
+     */
+	private ObservableList<NVRStream> streams = FXCollections.observableArrayList();
+    
 	/**
      * Default constructor.
      */
@@ -263,5 +269,13 @@ public class DataSet {
     
     public ObjectProperty<TimeOfTheDay> timeOfTheDayProperty(){
     	return timeOfTheDay;
+    }
+    
+    public ObservableList<NVRStream> getStreams(){
+    	return streams;
+    }
+    
+    public void setStreams(ObservableList<NVRStream> streams) {
+    	this.streams = streams;
     }
 }

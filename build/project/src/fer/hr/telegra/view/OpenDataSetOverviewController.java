@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.callback.Callback;
@@ -23,6 +25,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import org.magicwerk.brownies.collections.BigList;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -36,6 +44,8 @@ import fer.hr.telegra.model.ChangeableHistory;
 import fer.hr.telegra.model.DataImage;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ImageQuality;
+import fer.hr.telegra.model.NVRFetching;
+import fer.hr.telegra.model.NVRStream;
 import fer.hr.telegra.model.Operation;
 import fer.hr.telegra.model.OperationRectangleWrappers;
 import fer.hr.telegra.model.ResizableRectangle;
@@ -158,6 +168,8 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private CheckBox lockZoomLevel;
 	@FXML
+	private CheckBox fetchFromNVR;
+	@FXML
 	private Button saveButton;
 	@FXML
 	private Button backButton;
@@ -253,7 +265,13 @@ public class OpenDataSetOverviewController {
 		            if(!empty | item != null) {
 		            	this.setText(item);
 		            	//this.textFillProperty().bind(mainApp.getColorOfClasses().get(item));
-		            	String color = mainApp.getColorOfClasses().get(item).get().toString();
+		            	String color = "";
+		            	if(mainApp.getAnnotations().contains(item)) {
+		            		color = mainApp.getColorOfClasses().get(item).get().toString();
+		            	}
+		            	else {
+		            		color = mainApp.getDefaultColor().toString();
+		            	}
 		            	color = color.substring(2);
 		            	color = "#" + color;
 		            	String style = "-fx-background-color: " + color;
@@ -271,13 +289,25 @@ public class OpenDataSetOverviewController {
 		
 		// Add listener for which image need to be display in imageview
 		listOfImg.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			System.out.println("newvalue: " + newValue);
 			if (newValue != null) {
-				listOfImgWithAnnotations.getSelectionModel().select(-1);
-				listOfVerImg.getSelectionModel().select(-1);
-				showImage(newValue);
+				if(oldValue != null) {
+					if(!oldValue.equals(newValue)) {
+						listOfImgWithAnnotations.getSelectionModel().select(-1);
+						listOfVerImg.getSelectionModel().select(-1);
+						showImage(newValue);
+					}
+				}
+				else {
+					listOfImgWithAnnotations.getSelectionModel().select(-1);
+					listOfVerImg.getSelectionModel().select(-1);
+					showImage(newValue);
+				}
+				
 			}
 			else {
 				if(imgs.isEmpty()) {
+					System.out.println("tu sam uso");
 					listOfImgWithAnnotations.getSelectionModel().select(imgsWithAnnotations.size()-1);
 					listOfImgWithAnnotations.getFocusModel()
 					.focus(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex());
@@ -449,6 +479,18 @@ public class OpenDataSetOverviewController {
 	 */
 	public void setDataSet(DataSet dataSet) {
 		this.dataSet = dataSet;
+		if(dataSet.getStreams() == null || dataSet.getStreams().isEmpty()) {
+			System.out.println("Normalni set");
+			fetchFromNVR.setDisable(true);
+		}
+		else {
+			if(dataSet.getDataSetImages().size() == 0) {
+				String imageName = NVRFetching.generateRandomNVRimage(dataSet.getStreams(), dataSet.getDataSetImagesLocation());
+				if(imageName != null) {
+					updateDataset(imageName);
+				}
+			}
+		}
 		updateAnnotationsNumber();
 		BigList<DataImage> images = BigList.create(dataSet.getDataSetImages());
 		Iterator<DataImage> itr = images.iterator();
@@ -524,6 +566,7 @@ public class OpenDataSetOverviewController {
 					}
 				}
 				listOfImg.getItems().remove(item);
+				updateAnnotationsNumber();
 				file = MainApp.getLastFilePath();
 				mainApp.saveDataSetsToFile(file);
 
@@ -598,6 +641,7 @@ public class OpenDataSetOverviewController {
 					}
 				}
 				listOfImgWithAnnotations.getItems().remove(item);
+				updateAnnotationsNumber();
 				file = MainApp.getLastFilePath();
 				mainApp.saveDataSetsToFile(file);
 
@@ -690,6 +734,7 @@ public class OpenDataSetOverviewController {
 					}
 				}
 				listOfVerImg.getItems().remove(item);
+				updateAnnotationsNumber();
 				file = MainApp.getLastFilePath();
 				mainApp.saveDataSetsToFile(file);
 
@@ -857,8 +902,12 @@ public class OpenDataSetOverviewController {
 			rectangleWrapperNew.getRectangle().setFill(Color.WHITE.deriveColor(0, 1.2, 1, 0.2));
 		}
 		if (rectangleWrapperOld != null) {
-			rectangleWrapperOld.getRectangle()
-					.setFill(mainApp.getColorOfClasses().get(rectangleWrapperOld.getKlass()).get());
+			if(mainApp.getAnnotations().contains(rectangleWrapperOld.getKlass())) {
+				rectangleWrapperOld.getRectangle().setFill(mainApp.getColorOfClasses().get(rectangleWrapperOld.getKlass()).get());
+			}
+			else {
+				rectangleWrapperOld.getRectangle().setFill(mainApp.getDefaultColor());
+			}
 
 		}
 		editButton.setDisable(false);
@@ -985,7 +1034,12 @@ public class OpenDataSetOverviewController {
 						} else {
 							annotations.add(rectWrap);
 						}
-						rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+						if(mainApp.getAnnotations().contains(rectWrap.getKlass()) != false) {
+							rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+						}
+						else {
+							rectWrap.getRectangle().setFill(mainApp.getDefaultColor());
+						}
 						boolean overlapFlag = rectWrap.getOverlap();
 						boolean truncatedFlag = rectWrap.getTruncated();
 						boolean difficultFlag = rectWrap.getDifficult();
@@ -1413,12 +1467,22 @@ public class OpenDataSetOverviewController {
 	@FXML
 	private void handleNext() {
 		if (listOfImg.getSelectionModel().getSelectedItem() != null) {
+			if(fetchFromNVR.isSelected()) {
+				String imageName = NVRFetching.generateRandomNVRimage(dataSet.getStreams(), dataSet.getDataSetImagesLocation());
+				if(imageName != null) {
+					updateDataset(imageName);
+					imgs.add(imageName);
+				}
+			}
 			listOfImg.getSelectionModel().selectNext();
 			listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
 			listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
 		} else if (listOfImgWithAnnotations.getSelectionModel().getSelectedItem() != null) {
 			if(listOfImgWithAnnotations.getSelectionModel().getSelectedIndex() == (imgsWithAnnotations.size()-1)) {
-				listOfImg.getSelectionModel().select(0);
+				System.out.println("babaroga");
+				if(listOfImg.getSelectionModel().getSelectedIndex() != 0) {
+					listOfImg.getSelectionModel().select(0);
+				}
 				listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
 				listOfImg.scrollTo(listOfImg.getSelectionModel().getSelectedIndex());
 				return;
@@ -1541,7 +1605,7 @@ public class OpenDataSetOverviewController {
 	public void clearSelection(Group group) {
 		if (group.getChildren().size() > 1) {
 			// deletes everything except for base container layer
-			System.out.println(group.getChildren().size());
+			//System.out.println(group.getChildren().size());
 			group.getChildren().remove(1, group.getChildren().size());
 			index = 0;
 		}
@@ -1587,7 +1651,12 @@ public class OpenDataSetOverviewController {
 				return;
 			}
 			for (ResizableRectangleWrapper rectWrap : annotations) {
-				rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+				if(mainApp.getAnnotations().contains(rectWrap.getKlass()) != false) {
+					rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+				}
+				else {
+					rectWrap.getRectangle().setFill(mainApp.getDefaultColor());
+				}
 			}
 			for(javafx.scene.Node node: imageGroup.getChildren()) {
 				node.setVisible(true);
@@ -1871,30 +1940,25 @@ public class OpenDataSetOverviewController {
 		}
 	}
 	
+	/**
+	 * Method that add new image to the dataset after fetching it from NVR
+	 * @param imageName is string that represent the new image name
+	 */
+	private void updateDataset(String imageName) {
+		DataImage dataImage = new DataImage(imageName);
+		
+		dataSet.addDataSetImage(dataImage);
+		File file = MainApp.getLastFilePath();
+		mainApp.saveDataSetsToFile(file);
+		//imgs.add(imageName);
+	}
+	
+	
 	private void testPrint() {
-		System.out.println(history.currentIndex);
-		for(OperationRectangleWrappers rect: history.rectangles) {
-			System.out.println("*************");
-			ResizableRectangleWrapper newRect = rect.getRectangleWrapperNew();
-			ResizableRectangleWrapper oldRect = rect.getRectangleWrapperOld();
-			if(newRect != null) {
-				System.out.println(newRect.getRectangle());
-			}
-			else {
-				System.out.println("null");
-			}
-			if(oldRect != null) {
-				System.out.println(oldRect.getRectangle());
-			}
-			else {
-				System.out.println("null");
-			}
-			System.out.println("*************");
-		}
-		for(Operation op: history.operations) {
-			System.out.println("--------------");
-			System.out.println(op);
-			System.out.println("--------------");
+		String imageName = NVRFetching.generateNVRImage(dataSet.getStreams().get(0), dataSet.getDataSetImagesLocation(), dataSet.getStreams().get(0).getStartTime());
+		if(imageName != null) {
+			updateDataset(imageName);
+			imgs.add(imageName);
 		}
 	}
 }

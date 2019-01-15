@@ -44,6 +44,7 @@ import fer.hr.telegra.model.ChangeableHistory;
 import fer.hr.telegra.model.DataImage;
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.ImageQuality;
+import fer.hr.telegra.model.NVRFetching;
 import fer.hr.telegra.model.NVRStream;
 import fer.hr.telegra.model.Operation;
 import fer.hr.telegra.model.OperationRectangleWrappers;
@@ -484,8 +485,10 @@ public class OpenDataSetOverviewController {
 		}
 		else {
 			if(dataSet.getDataSetImages().size() == 0) {
-				String imageName = generateNVRimage();
-				updateDataset(imageName);
+				String imageName = NVRFetching.generateRandomNVRimage(dataSet.getStreams(), dataSet.getDataSetImagesLocation());
+				if(imageName != null) {
+					updateDataset(imageName);
+				}
 			}
 		}
 		updateAnnotationsNumber();
@@ -1465,9 +1468,11 @@ public class OpenDataSetOverviewController {
 	private void handleNext() {
 		if (listOfImg.getSelectionModel().getSelectedItem() != null) {
 			if(fetchFromNVR.isSelected()) {
-				String imageName = generateNVRimage();
-				updateDataset(imageName);
-				imgs.add(imageName);
+				String imageName = NVRFetching.generateRandomNVRimage(dataSet.getStreams(), dataSet.getDataSetImagesLocation());
+				if(imageName != null) {
+					updateDataset(imageName);
+					imgs.add(imageName);
+				}
 			}
 			listOfImg.getSelectionModel().selectNext();
 			listOfImg.getFocusModel().focus(listOfImg.getSelectionModel().getSelectedIndex());
@@ -1948,131 +1953,12 @@ public class OpenDataSetOverviewController {
 		//imgs.add(imageName);
 	}
 	
-	/**
-	 * Method which fetch new random frame from NVR and save this new image to the dataset image direcotry
-	 * @return string that represent name of new image (e.g. 20170827T211325.387.png)
-	 */
-	private String generateNVRimage() {
-		String imageName;
-		//Choose random one of streams
-		NVRStream randomStream = dataSet.getStreams().get(new Random().nextInt(dataSet.getStreams().size()));
-		Timestamp randomTimestamp = generateRandomTimeStamp(randomStream.getStartTime(), randomStream.getEndTime());
-		
-		Mat frame = getFrameFromNVR(randomTimestamp, randomStream.getAddress());
-		// Convert from OpenCV Mat to Java Buffered image
-        OpenCVFrameConverter converter = new OpenCVFrameConverter.ToMat();
-        Frame ff = converter.convert(frame);
-        Java2DFrameConverter cnvrt = new Java2DFrameConverter();
-		BufferedImage bImage = cnvrt.convert(ff);
-		
-		//Save image to disk
-		try {
-			imageName = parseTimestamp(randomTimestamp) + ".png";
-			String path = dataSet.getDataSetImagesLocation() + "\\" + imageName;
-		    File outputfile = new File(path);
-		    ImageIO.write(bImage, "png", outputfile);
-		    return imageName;
-		} catch (IOException e) {
-		    // handle exception
-			//TODO dodaj alert da ne moze spremit sliku
-			return null;
-		}
-	}
-	
-	/**
-	 * Method which generate random time stamp in range
-	 * @param startTime is start of the time range (format: yyyyMMddTHHmmss)
-	 * @param endTime is end of the time range (format: yyyyMMddTHHmmss)
-	 * @return random time stamp (format: yyyy-mm-dd hh:mm:ss.fff)
-	 */
-	private Timestamp generateRandomTimeStamp(String startTime, String endTime) {
-		String newStart = parseTime(startTime);
-		String newEnd = parseTime(endTime);
-		
-		long offset = Timestamp.valueOf(newStart).getTime();
-		long end = Timestamp.valueOf(newEnd).getTime();
-		long diff = end - offset + 1;
-		Timestamp random = new Timestamp(offset + (long)(Math.random() * diff));
-		
-		return random;
-	}
-	
-	/**
-	 * Convert time in yyyyMMddTHHmmss format to yyyy-mm-dd hh:mm:ss
-	 * @param time is time in yyyyMMddTHHmmss format
-	 * @return time in yyyy-mm-dd hh:mm:ss format
-	 */
-	private String parseTime(String time) {
-		String year = time.substring(0, 4);
-		String month = time.substring(4, 6);
-		String day = time.substring(6, 8);
-		String hours = time.substring(9, 11);
-		String minutes = time.substring(11, 13);
-		String seconds = time.substring(13);
-		String newTime = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
-		
-		return newTime;
-	}
-	
-	/**
-	 * Convert time stamp to yyyyMMddTHHmmss.fff format
-	 * @param timestamp is time in yyyy-mm-dd hh:mm:ss.fff format
-	 * @return time in yyyyMMddTHHmmss.fff format
-	 */
-	private String parseTimestamp(Timestamp timestamp) {
-		String time ="";
-		String tempTime = timestamp.toString();
-		String year = tempTime.substring(0, 4);
-		String month = tempTime.substring(5, 7);
-		String day = tempTime.substring(8, 10);
-		String hours = tempTime.substring(11, 13);
-		String minutes = tempTime.substring(14, 16);
-		String seconds = tempTime.substring(17, 19);
-		String frame = tempTime.substring(20);
-		
-		time = year + month + day + "T" + hours + minutes + seconds + "." + frame;
-		
-		return time;
-	}
-	
-	/**
-	 * Method to fetch frame on given time stamp from NVR
-	 * @param timestamp is time stamp from which frame need to be fetched
-	 * @param streamAddress is address of NVR stream
-	 * @return openCV mat that contains fetched image
-	 * TODO Ovdje treba pozivati c++ kod za fetchanje sa NVR-a
-	 */
-	private Mat getFrameFromNVR(Timestamp timestamp, String streamAddress) {
-		Mat frame = imread("D:\\work_in_progress\\TaggingAppTest\\_fakeimages\\slika.bmp");
-		
-		return frame;
-	}
-	
 	
 	private void testPrint() {
-		System.out.println(history.currentIndex);
-		for(OperationRectangleWrappers rect: history.rectangles) {
-			System.out.println("*************");
-			ResizableRectangleWrapper newRect = rect.getRectangleWrapperNew();
-			ResizableRectangleWrapper oldRect = rect.getRectangleWrapperOld();
-			if(newRect != null) {
-				System.out.println(newRect.getRectangle());
-			}
-			else {
-				System.out.println("null");
-			}
-			if(oldRect != null) {
-				System.out.println(oldRect.getRectangle());
-			}
-			else {
-				System.out.println("null");
-			}
-			System.out.println("*************");
-		}
-		for(Operation op: history.operations) {
-			System.out.println("--------------");
-			System.out.println(op);
-			System.out.println("--------------");
+		String imageName = NVRFetching.generateNVRImage(dataSet.getStreams().get(0), dataSet.getDataSetImagesLocation(), dataSet.getStreams().get(0).getStartTime());
+		if(imageName != null) {
+			updateDataset(imageName);
+			imgs.add(imageName);
 		}
 	}
 }

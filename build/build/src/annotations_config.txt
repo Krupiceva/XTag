@@ -1,7 +1,7 @@
 car
-mini van
-van
 lcv
+van
+mini van
 bus
 truck
 articulated truck

@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.prefs.Preferences;
 
@@ -16,6 +18,7 @@ import javax.xml.bind.Unmarshaller;
 
 import fer.hr.telegra.model.DataSet;
 import fer.hr.telegra.model.DataSetListWrapper;
+import fer.hr.telegra.model.NVRFetching;
 import fer.hr.telegra.model.PathData;
 import fer.hr.telegra.model.ResizableRectangle;
 import fer.hr.telegra.model.ResizableRectangleWrapper;
@@ -29,6 +32,7 @@ import fer.hr.telegra.view.DataSetEditDialogController;
 import fer.hr.telegra.view.DataSetsOverviewController;
 import fer.hr.telegra.view.EditAnnotationDialogController;
 import fer.hr.telegra.view.ExportFramesDialogController;
+import fer.hr.telegra.view.ImportImagesFromNVRDialogController;
 import fer.hr.telegra.view.OpenDataSetOverviewController;
 import fer.hr.telegra.view.RootLayoutController;
 import javafx.application.Application;
@@ -433,6 +437,43 @@ public class MainApp extends Application {
 	}
 	
 	/**
+	 * Show dialog with progress bar that indicate percent of images imported from nvr
+	 * @return true if images are successfully imported, false otherwise
+	 */
+	public boolean showImportImagesFromNVRDialog (DataSet dataset, Integer numberOfImages) {
+		try {
+			//Load fxml file
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ImportImagesFromNVRDialog.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+			
+			//Create new dialog stage
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Import images:");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        dialogStage.initOwner(primaryStage);
+	        Image appIcon = new Image(getClass().getResourceAsStream("/Apps-xorg-icon.png"));
+	        dialogStage.getIcons().add(appIcon);
+	        Scene scene = new Scene(page);
+	        dialogStage.setScene(scene);
+	        
+	        //Set the dataset into controller
+	        ImportImagesFromNVRDialogController controller = loader.getController();
+	        controller.setDialogStage(dialogStage);
+	        controller.setDataSet(dataset, numberOfImages);
+	        
+	        //Show dialog and wait for user
+	        dialogStage.showAndWait();
+	        return controller.isOk();
+	        
+	        //return controller.isOkClicked();	        
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
 	 * Open dialog for annotate new object, if user click ok it added this annotation to the corresponding image
 	 * @param imageGroup is group that contains main image and other annotations rectangle
 	 * @param rectangle is bounding box of corresponding annotation
@@ -657,6 +698,7 @@ public class MainApp extends Application {
 				pathData.path = line;
 			}
 			reader.close();
+			System.setProperty("jna.library.path", "dll");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

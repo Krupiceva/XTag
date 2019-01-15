@@ -357,6 +357,11 @@
 		</copy>
 		<copy todir="externalLibs">
 			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
+				<filename name="jna-5.1.0.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp\lib">
 				<filename name="artoolkitplus-android-x86.jar"/>
 			</fileset>
 		</copy>
@@ -474,22 +479,7 @@
 		<mkdir dir="project" />
 		<copy todir="project">
 			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
-				<include name="sample/**" />
-			</fileset>
-		</copy>
-		<copy todir="project">
-			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
-				<include name="icons/**" />
-			</fileset>
-		</copy>
-		<copy todir="project">
-			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
-				<include name="src/**" />
-			</fileset>
-		</copy>
-		<copy todir="project">
-			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
-				<include name="sample\images/**" />
+				<include name="dll/**" />
 			</fileset>
 		</copy>
 		<copy todir="project">
@@ -499,12 +489,32 @@
 		</copy>
 		<copy todir="project">
 			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="sample\annotations/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="icons/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
 				<include name="config/**" />
 			</fileset>
 		</copy>
 		<copy todir="project">
 			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
-				<include name="sample\annotations/**" />
+				<include name="src/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="sample/**" />
+			</fileset>
+		</copy>
+		<copy todir="project">
+			<fileset dir="C:\Users\dmlinaric\workspace\TaggingApp">
+				<include name="sample\images/**" />
 			</fileset>
 		</copy>
 	
@@ -592,6 +602,7 @@
 				<include name="flycapture.jar"/>
 				<include name="flycapture-windows-x86.jar"/>
 				<include name="flandmark-windows-x86.jar"/>
+				<include name="jna-5.1.0.jar"/>
 				<include name="librealsense-linux-x86.jar"/>
 				<include name="artoolkitplus-macosx-x86_64.jar"/>
 				<include name="opencv-windows-x86.jar"/>
@@ -622,6 +633,11 @@
 		</copy>
 		<copy todir="build/src">
 			<fileset dir="project/data">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="build/src">
+			<fileset dir="project/dll">
 				<include name="**/*"/>
 			</fileset>
 		</copy>
@@ -667,6 +683,9 @@
 		<fileset dir="project/data">
 			<exclude name="**/*.java"/>
 		</fileset>
+		<fileset dir="project/dll">
+			<exclude name="**/*.java"/>
+		</fileset>
 		<fileset dir="project/src">
 			<exclude name="**/*.java"/>
 		</fileset>
@@ -705,6 +724,7 @@
 			<fx:fileset dir="dist" includes="libs/*"/>
 			<fx:fileset dir="dist" includes="config/*"/>
 			<fx:fileset dir="dist" includes="data/*"/>
+			<fx:fileset dir="dist" includes="dll/*"/>
 			<fx:fileset dir="dist" includes="icons/*"/>
 			<fx:fileset dir="dist" includes="sample/*"/>
 			<fx:fileset dir="dist" includes="sample/annotations/*"/>
@@ -714,7 +734,7 @@
 		<fx:application id="fxApplication"
 			name="XTag"
 			mainClass="fer.hr.telegra.MainApp"
-			version="2.0.1"
+			version="3.0.0"
 		/>
 	
 		<mkdir dir="build/classes/META-INF" />
@@ -730,7 +750,7 @@
 			<manifest>
 				<attribute name="Implementation-Vendor" value="fer.hr.telegra"/>
 				<attribute name="Implementation-Title" value="XTag"/>
-				<attribute name="Implementation-Version" value="2.0.1"/>
+				<attribute name="Implementation-Version" value="3.0.0"/>
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
 			</manifest>
 		</fx:jar>

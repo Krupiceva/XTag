@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="dll" path="dll"/>
 	<classpathentry excluding="annotations/|images/" kind="src" path="sample"/>
 	<classpathentry kind="src" path="icons"/>
 	<classpathentry kind="src" output="data" path="data"/>
@@ -99,5 +100,6 @@
 	<classpathentry kind="lib" path="lib/videoinput-windows-x86_64.jar"/>
 	<classpathentry kind="lib" path="lib/videoinput-windows-x86.jar"/>
 	<classpathentry kind="lib" path="lib/videoinput.jar"/>
+	<classpathentry kind="lib" path="lib/jna-5.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

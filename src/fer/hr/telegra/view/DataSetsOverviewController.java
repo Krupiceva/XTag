@@ -456,7 +456,8 @@ public class DataSetsOverviewController {
        };
        
        
-       private void displayLabelForData(XYChart.Data<String, Integer> data) {
+       @SuppressWarnings("unused")
+	private void displayLabelForData(XYChart.Data<String, Integer> data) {
     	   final Node node = data.getNode();
     	   final Text dataText = new Text(data.getYValue() + "");
     	   node.parentProperty().addListener(new ChangeListener<Parent>() {

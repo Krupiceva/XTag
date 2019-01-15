@@ -3,8 +3,8 @@
 [Setup]
 AppId={{fxApplication}}
 AppName=XTag
-AppVersion=2.0.0
-AppVerName=XTag 2.0.0
+AppVersion=3.0.0
+AppVerName=XTag 3.0.0
 AppPublisher=fer.hr.telegra
 AppComments=TaggingApp
 AppCopyright=Copyright (C) 2018
@@ -23,7 +23,7 @@ DefaultGroupName=fer.hr.telegra
 LicenseFile=
 ;WinXP or above
 MinVersion=0,5.1 
-OutputBaseFilename=XTag-2.0.1
+OutputBaseFilename=XTag-3.0.0
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest

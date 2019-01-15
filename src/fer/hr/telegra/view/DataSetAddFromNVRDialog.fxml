@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -12,7 +13,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane maxHeight="450.0" maxWidth="400.0" minHeight="450.0" minWidth="400.0" prefHeight="450.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fer.hr.telegra.view.DataSetAddFromNVRDialogController">
+<AnchorPane maxHeight="450.0" maxWidth="400.0" minHeight="450.0" minWidth="400.0" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fer.hr.telegra.view.DataSetAddFromNVRDialogController">
    <children>
       <GridPane layoutX="117.0" layoutY="105.0" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
          <columnConstraints>
@@ -72,7 +73,7 @@
             <ComboBox fx:id="timeOfTheDayCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
-      <TableView fx:id="streamTable" layoutX="75.0" layoutY="213.0" prefHeight="450.0" prefWidth="400.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="250.0">
+      <TableView fx:id="streamTable" layoutX="75.0" layoutY="213.0" prefHeight="450.0" prefWidth="400.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="250.0">
         <columns>
           <TableColumn fx:id="streamAddress" prefWidth="75.0" text="Stream" />
           <TableColumn fx:id="streamStart" prefWidth="75.0" text="Start" />
@@ -82,12 +83,15 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <ButtonBar layoutX="178.0" layoutY="416.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="420.0">
+      <ButtonBar layoutX="200.0" layoutY="416.0" prefHeight="30.0" prefWidth="195.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="420.0">
         <buttons>
           <Button mnemonicParsing="false" onAction="#handleImport" text="Import" />
             <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
         </buttons>
       </ButtonBar>
       <Button layoutX="14.0" layoutY="213.0" mnemonicParsing="false" onAction="#handleAddNewStream" text="Add New Stream..." AnchorPane.bottomAnchor="212.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="213.0" />
+      <CheckBox fx:id="initImport" layoutX="14.0" layoutY="424.0" mnemonicParsing="false" text="Initially import" AnchorPane.bottomAnchor="5.0" />
+      <TextField fx:id="numberOfInitImagesField" layoutX="160.0" layoutY="420.0" prefHeight="25.0" prefWidth="40.0" AnchorPane.bottomAnchor="5.0" />
+      <Label fx:id="numberOfInitImagesLabel" layoutX="123.0" layoutY="424.0" text="num:" AnchorPane.bottomAnchor="5.0" />
    </children>
 </AnchorPane>

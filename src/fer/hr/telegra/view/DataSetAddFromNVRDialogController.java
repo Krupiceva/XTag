@@ -12,12 +12,15 @@ import fer.hr.telegra.model.NVRStream;
 import fer.hr.telegra.model.PathData;
 import fer.hr.telegra.model.TimeOfTheDay;
 import fer.hr.telegra.model.WeatherConditions;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -26,6 +29,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.CheckBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -95,6 +99,21 @@ public class DataSetAddFromNVRDialogController {
 	 */
 	@FXML
 	private TableColumn<NVRStream, String> streamEnd;
+	/**
+	 * Checkbox that indicate if images need to be import first 
+	 */
+	@FXML
+	private CheckBox initImport;
+	/**
+	 * Textfield with number of images that need to be import first
+	 */
+	@FXML
+	private TextField numberOfInitImagesField;
+	/**
+	 * Label of number of images that need to be import first
+	 */
+	@FXML
+	private Label numberOfInitImagesLabel;
 	
 	/**
 	 * Stage of this dialog window
@@ -175,6 +194,21 @@ public class DataSetAddFromNVRDialogController {
     	        }
     	    }
     	);
+    	
+		numberOfInitImagesField.setDisable(true);
+		numberOfInitImagesLabel.setDisable(true);
+		initImport.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					numberOfInitImagesField.setDisable(false);
+					numberOfInitImagesLabel.setDisable(false);
+				} else if (!newValue) {
+					numberOfInitImagesField.setDisable(true);
+					numberOfInitImagesLabel.setDisable(true);
+				}
+			}
+		});
 	}
 	
 	/**
@@ -257,7 +291,13 @@ public class DataSetAddFromNVRDialogController {
 			dataSet.setImageQuality(imageQualityCombo.getValue());
 			dataSet.setTimeOfTheDay(timeOfTheDayCombo.getValue());
 			dataSet.setStreams(streams);
-			okClicked = true;
+			boolean ok = true;
+			if(initImport.isSelected()) {
+				int numberOfImages = Integer.parseInt(numberOfInitImagesField.getText());
+				ok = mainApp.showImportImagesFromNVRDialog(dataSet, numberOfImages);
+			}
+			
+			okClicked = ok;
 			this.dialogStage.close();
     	}
     }
@@ -390,6 +430,20 @@ public class DataSetAddFromNVRDialogController {
     	
     	if(streams.isEmpty()) {
     		errorMessage += "No valid stream! Please enter at least one stream.\n";
+    	}
+    	
+    	if(initImport.isSelected()) {
+    		if(numberOfInitImagesField.getText() == null) {
+    			errorMessage += "No valid number of images to import. Please enter valid number.\n";
+    		}
+    		else {
+        		//Try parse number to integer
+        		try {
+        			Integer.parseInt(numberOfInitImagesField.getText());
+        		} catch (NumberFormatException e) {
+        			errorMessage += "No valid number of images to import. Please enter valid number.\n";
+        		}
+        	}
     	}
     	
     	//If input is ok

@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import fer.hr.telegra.model.*;
 /**
- * Controller class for adding new dataset to the database of application
+ * Controller class for adding new dataset from disk to the database of application
  * @author dmlinaric
  *
  */
@@ -112,6 +112,9 @@ public class DataSetAddDialogController {
 	 * reference to the new added dataset
 	 */
 	private DataSet dataSet;
+	 /**
+     * Flag that shows if user is clicked ok
+     */
 	private boolean okClicked = false;
 	/**
 	 * Importtask for importing images that will be executed in separate theard
@@ -404,7 +407,7 @@ public class DataSetAddDialogController {
 			dataSet.setWeatherCondition(weatherConditionCombo.getValue());
 			dataSet.setImageQuality(imageQualityCombo.getValue());
 			dataSet.setTimeOfTheDay(timeOfTheDayCombo.getValue());
-
+			
 			File dir = new File(imagesLocationField.getText());
 			// File[] files = dir.listFiles();
 			/**

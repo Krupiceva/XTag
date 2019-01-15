@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="TaggingApp.jar" size="10088949" download="eager" />
+    <jar href="TaggingApp.jar" size="13713945" download="eager" />
     <jar href="libs\artoolkitplus-android-arm.jar" size="315890" download="eager" />
     <jar href="libs\artoolkitplus-android-x86.jar" size="404918" download="eager" />
     <jar href="libs\artoolkitplus-linux-armhf.jar" size="146986" download="eager" />
@@ -53,6 +53,7 @@
     <jar href="libs\javacpp.jar" size="341717" download="eager" />
     <jar href="libs\javacv-platform.jar" size="2359" download="eager" />
     <jar href="libs\javacv.jar" size="389412" download="eager" />
+    <jar href="libs\jna-5.1.0.jar" size="1487481" download="eager" />
     <jar href="libs\libdc1394-linux-armhf.jar" size="132164" download="eager" />
     <jar href="libs\libdc1394-linux-ppc64le.jar" size="167248" download="eager" />
     <jar href="libs\libdc1394-linux-x86.jar" size="162155" download="eager" />
@@ -99,6 +100,12 @@
     <jar href="libs\videoinput-windows-x86.jar" size="97723" download="eager" />
     <jar href="libs\videoinput-windows-x86_64.jar" size="115222" download="eager" />
     <jar href="libs\videoinput.jar" size="16689" download="eager" />
+    <nativelib href="dll\avcodec-55.dll"/>
+    <nativelib href="dll\avdevice-55.dll"/>
+    <nativelib href="dll\avformat-55.dll"/>
+    <nativelib href="dll\avutil-52.dll"/>
+    <nativelib href="dll\nvrfetch.dll"/>
+    <nativelib href="dll\swscale-2.dll"/>
   </resources>
   <jfx:javafx-desc  width="0" height="0" main-class="fer.hr.telegra.MainApp"  name="XTag" />
   <update check="background"/>

@@ -77,7 +77,12 @@ public class ResizableRectangle extends Rectangle {
     			int ymax = rectWrap.getYMax();
     			int curx = (int) event.getX();
     			int cury = (int) event.getY();
-    			rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+    			if(mainApp.getAnnotations().contains(rectWrap.getKlass())) {
+    				rectWrap.getRectangle().setFill(mainApp.getColorOfClasses().get(rectWrap.getKlass()).get());
+    			}
+    			else {
+    				rectWrap.getRectangle().setFill(mainApp.getDefaultColor());
+    			}
     			if(curx > xmin && curx < xmax && cury > ymin && cury < ymax) {
     				rectWrap.getRectangle().setFill(Color.WHITE.deriveColor(0, 1.2, 1, 0.2));;
     				annotationsTable.getSelectionModel().select(rectWrap);
